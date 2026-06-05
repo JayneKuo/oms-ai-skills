@@ -1,6 +1,6 @@
 ﻿---
 name: allocation
-description: Diagnose OMS sales-order warehouse allocation, dispatch assignment, remaining quantity, manual/auto allocation eligibility, and allocation explanations. Use when the user asks which warehouse an order went to, why it went there, or whether allocation can be performed.
+description: Diagnose and operate OMS sales-order allocation, dispatch assignment, reopen-for-allocation retry, remaining quantity, manual/auto allocation eligibility, and allocation explanations. Use when the user asks which warehouse an order went to, why it went there, whether allocation can be performed, or whether an exception order should be reopened to retry allocation.
 ---
 
 # Allocation Skill
@@ -13,6 +13,7 @@ The allocation skill must distinguish these dispatch modes:
 - `HAND_SKU_DISPATCH`: manually assign specific SKU quantities to specified warehouse(s). Use this when the user says to allocate by SKU or split SKUs across warehouses.
 - `HAND_WHOLE_AUTO_DISPATCH`: ask OMS to auto-dispatch the whole order by current dispatch rules.
 - `HAND_SKU_AUTO_DISPATCH`: ask OMS to auto-dispatch specific SKU quantities by current dispatch rules.
+- `REOPEN_DISPATCH` / order reopen: retry allocation/dispatch after an EXCEPTION blocker is resolved. This belongs to allocation because the business outcome is re-entering allocation, not a generic order operation.
 
 Before any dispatch write, check manual allocation eligibility and remaining quantities. Specified-warehouse dispatch requires a confirmed warehouse name/accounting code if OMS needs it. Auto-dispatch does not require a warehouse, but the user-facing answer must say OMS will re-run allocation rules rather than force a chosen warehouse.
 
@@ -40,7 +41,7 @@ python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_SKU_DISPATC
 
 - Use this skill for warehouse allocation result, allocation evidence, manual-allocation eligibility, and remaining quantity checks.
 - Read-only allocation checks/explanations may run directly. Any real manual/auto/force/batch allocation write must require user second confirmation before execution.
-- This skill owns allocation writes too: manual specified-warehouse dispatch, manual SKU dispatch, whole-order auto dispatch, SKU auto dispatch, force allocation after second confirmation, and batch allocation. Do not delegate allocation execution to `operations`.
+- This skill owns allocation writes too: manual specified-warehouse dispatch, manual SKU dispatch, whole-order auto dispatch, SKU auto dispatch, reopen-for-allocation retry, force allocation after second confirmation, and batch allocation. Do not delegate allocation execution to `operations`.
 - Warehouse assignment reasons must come from real allocation, dispatch explain logs, route execution logs, or explicit order-detail evidence. Final warehouse/status fields alone prove the result, not the reason.
 - Always check remaining quantity before recommending manual allocation. If remaining is zero, say manual allocation is not needed or not possible.
 - For already allocated orders, do not say "I will allocate it" or "allocation failed" first. Say "this order is already allocated", show the dispatch/warehouse/SKU/remaining details, and explain there are no allocatable products left.
@@ -76,7 +77,7 @@ For allocation write requests before execution, reply first:
 ```text
 This is a real OMS allocation action, so I will not execute it yet.
 Environment: [staging/production]
-Operation: [manual whole-order / manual SKU / auto whole-order / auto SKU / force / batch allocation]
+Operation: [manual whole-order / manual SKU / auto whole-order / auto SKU / reopen allocation retry / force / batch allocation]
 Targets: [order list, warehouse if specified, SKU quantities if specified]
 Risk: [OMS may create or change dispatch allocation and downstream warehouse processing may start]
 To proceed, reply exactly: [confirmation phrase]
@@ -119,10 +120,12 @@ python scripts/get_allocation_items.py --order SO00361770
 python scripts/get_order_detail.py --order SO00361770
 python scripts/get_routing_rules.py
 python scripts/explain_warehouse_assignment.py --order SO00361770
+python scripts/reopen_order.py --order SO00361770 --confirm-reopen
 python scripts/manual_allocate.py --order SO00361770 --warehouse WH-001 --skus '[{"sku":"SKU-A","qty":2}]' --confirm-allocation
 python scripts/batch_allocation.py --action explain --orders SO001 SO002
 python scripts/batch_allocation.py --action items --orders SO001 SO002
 python scripts/batch_allocation.py --action check --orders SO001 SO002
+python scripts/batch_allocation.py --action reopen --orders SO001 SO002 --confirm-allocation
 python scripts/batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
 ```
 
@@ -133,6 +136,7 @@ Support batch user requests for every allocation capability:
 - Batch query/explain: `batch_allocation.py --action explain`.
 - Batch remaining items: `batch_allocation.py --action items`.
 - Batch manual eligibility: `batch_allocation.py --action check`.
+- Batch reopen allocation retry: `batch_allocation.py --action reopen`.
 - Batch manual/auto allocation after user second confirmation: `batch_allocation.py --action manual_allocate`.
 
 When OMS has no dedicated batch endpoint, use bounded per-order execution instead of a long serial loop:

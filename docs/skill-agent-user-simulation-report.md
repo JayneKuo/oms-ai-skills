@@ -23,7 +23,7 @@ Main remaining risk: several legacy Chinese sections and eval prompts are mojiba
 | T05 | "Why was this order allocated to Valley View?" | `allocation` | Pass | Must use allocation/dispatch/route/log evidence. Must not infer reason from final warehouse name alone. |
 | T06 | "Manually allocate SO00361770 to Valley View." | `allocation` then `operations` | Pass | Must check eligibility and remaining qty first. Actual allocation requires confirmation through operations. |
 | T07 | "Cancel order SO01390506." | `operations` | Pass | Must ask confirmation with environment, operation, target, risk, and exact phrase. Must not execute directly. |
-| T08 | "The order status did not change after reopen. What should I do?" | `operations` | Pass | Must distinguish API accepted/submitted from business completion. |
+| T08 | "The order status did not change after reopen. What should I do?" | `allocation` | Pass | Must distinguish API accepted/submitted from allocation/dispatch recovery. |
 | T09 | "Replenish BATESTSKU-1 by 100 EA and recommend a warehouse." | `replenishment` | Pass | Must explain recommended warehouse, evidence, alternatives, and confirmation need. |
 | T10 | "Create a 100 EA purchase order for BATESTSKU-1 to Valley View." | `replenishment` | Pass | User intent has warehouse/SKU/qty. Still should summarize environment and result; if policy treats PO creation as high-impact, ask confirmation first. |
 | T11 | "Check why this order is EXCEPTION; if inventory is short, replenish it." | `order-orchestrator` -> `query` -> `exception` -> `replenishment` | Pass | Multi-step order is correct. Must merge conclusions instead of dumping each tool's JSON. |

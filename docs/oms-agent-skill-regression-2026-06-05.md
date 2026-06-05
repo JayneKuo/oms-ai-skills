@@ -25,7 +25,7 @@ No real write operation was submitted during this regression. Write paths were v
 | `allocation` | `get_allocation_items.py --order SO01392133` | Returned SKU `BATESTSKU-1`, total `2`, allocated `2`, remaining `0`. | Passed |
 | `hold` | `hold_rules.py --action list --status ENABLED` | Returned enabled rule `batest0602`, priority `55`, permanent hold mode, channel/order-source scope. | Passed |
 | `hold` | `match_hold_rules_to_orders.py --orders SO01376525 SO01376524` | Returned historical/disabled candidates only and explicitly labeled direct causality as unconfirmed. | Passed |
-| `exception` | `diagnose_exception.py --order SO01373341` | Confirmed EXCEPTION cause as out of stock for SKU `DSPM-NL21-WOODLGH`; routed next step to replenishment before reopen. | Passed |
+| `exception` | `diagnose_exception.py --order SO01373341` | Confirmed EXCEPTION cause as out of stock for SKU `DSPM-NL21-WOODLGH`; routed next step to replenishment before allocation-owned reopen retry. | Passed |
 | `replenishment` | `suggest_purchase_order.py --sku BATESTSKU-1 --quantity 10` | Suggested first visible warehouse, returned alternatives, warned warehouse display name is not confirmed, and kept routing rules as context only. | Passed |
 
 ## Write Gate Regression Results
@@ -40,7 +40,7 @@ All focused write scripts now require explicit confirmation flags. Without the f
 | `hold/scripts/release_hold.py` | `--confirm-release` | Not submitted without flag. |
 | `hold/scripts/diagnose_hold.py --release` | `--confirm-release` | Diagnosis runs; release is not submitted without flag. |
 | `operations/scripts/cancel_order.py` | `--confirm-cancel` | Not submitted without flag. |
-| `operations/scripts/reopen_order.py` | `--confirm-reopen` | Not submitted without flag. |
+| `allocation/scripts/reopen_order.py` | `--confirm-reopen` | Not submitted without flag. |
 | `operations/scripts/batch_orders.py` | `--confirm-execute` | Not submitted without flag. |
 | `replenishment/scripts/create_purchase_order.py` | `--confirm-create` | Not submitted without flag. |
 | `replenishment/scripts/create_purchase_order_split.py` | `--confirm-create` | Not submitted without flag. |

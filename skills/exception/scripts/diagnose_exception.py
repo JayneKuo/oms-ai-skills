@@ -210,7 +210,7 @@ def build_diagnosis(order_no, order_response, allocation_summary, dispatch_summa
                 "affectedSkus": [out_of_stock_sku],
                 "reason": reserve,
                 "solution": f"先为 SKU {out_of_stock_sku} 补货或确认可用库存；库存到位后再重新触发订单处理流程。",
-                "nextStep": "交给 replenishment 做补货/采购建议；补货完成后，如业务确认需要重试，再由 operations 执行 reopen。",
+                "nextStep": "交给 replenishment 做补货/采购建议；补货完成后，如业务确认需要重试，再由 allocation 执行 reopen-for-allocation retry。",
             }
         )
         return base

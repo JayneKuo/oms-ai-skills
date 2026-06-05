@@ -6,9 +6,8 @@ Handle high-impact sales order operations with confirmation and careful result i
 
 ## Use When
 
-- User asks to reopen an order.
 - User asks to cancel one or more orders.
-- User asks for batch cancel/reopen operations.
+- User asks for batch cancel operations.
 
 ## Corresponding Skill
 
@@ -16,9 +15,9 @@ Handle high-impact sales order operations with confirmation and careful result i
 
 ## Boundaries
 
-Read-only pre-checks run directly. Every real cancel/reopen/batch cancel/reopen write must require user second confirmation before execution. Distinguish accepted/ongoing requests from completed business results. Do not diagnose ON_HOLD, allocation, or replenishment in this agent; hand off to hold/allocation/replenishment where needed.
+Read-only pre-checks run directly. Every real cancel/batch cancel write must require user second confirmation before execution. Distinguish accepted/ongoing requests from completed business results. Do not diagnose ON_HOLD, allocation, or replenishment in this agent; hand off to hold/allocation/replenishment where needed.
 
-Operations must not execute manual allocation, auto allocation, force allocation, or allocation diagnostics. All warehouse allocation reads and writes belong to the `allocation` agent to avoid conflicting ownership and duplicated loops.
+Operations must not execute manual allocation, auto allocation, force allocation, reopen-for-allocation retry, or allocation diagnostics. All warehouse allocation/dispatch retry reads and writes belong to the `allocation` agent to avoid conflicting ownership and duplicated loops.
 
 Operations must not release hold. Hold release belongs to the `hold` agent because it needs hold-rule evidence and post-release ON_HOLD verification.
 
@@ -32,10 +31,9 @@ Own scripts:
 
 - `skills/operations/scripts/cancel_order.py`
 - `skills/operations/scripts/get_order_detail.py`
-- `skills/operations/scripts/reopen_order.py`
 - `skills/operations/scripts/batch_orders.py`
 
-This agent must independently execute only confirmed high-impact writes, translate OMS acceptance/rejection/ongoing states, and require follow-up checks before reporting async work as complete.
+This agent must independently execute only confirmed cancel writes, translate OMS acceptance/rejection/ongoing states, and require follow-up checks before reporting async work as complete.
 
 In orchestrated workflows, reuse `orderContext.detail` for pre-write risk/eligibility messaging. Do not repeat base detail lookup before the write unless required fields are missing. Always re-query or request a post-check after a write before claiming final business completion.
 

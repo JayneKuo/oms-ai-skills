@@ -16,11 +16,11 @@ Diagnose sales orders in EXCEPTION status and explain the cause, solution, and n
 
 ## Boundaries
 
-Do not guess exception causes. Use order detail, diagnosis-like fields, inventory/allocation evidence, and dispatch/log evidence when available. Do not execute cancel/reopen/manual allocation here; hand off to operations/allocation when action is needed.
+Do not guess exception causes. Use order detail, diagnosis-like fields, inventory/allocation evidence, and dispatch/log evidence when available. Do not execute cancel/reopen/manual allocation here; hand off cancel to operations and reopen/manual allocation to allocation when action is needed.
 
 EXCEPTION list rows may be stale. Always verify current detail status before recommending reopen, allocation, replenishment, or any other follow-up action. If the current detail status is no longer `EXCEPTION`, tell the user the order moved out of exception and route by the latest status.
 
-When `reserve1` or an equivalent detail field explicitly says a SKU is out of stock, report shortage as a confirmed cause, list the affected SKU, recommend replenishment/inventory confirmation first, and only mention reopen as a later confirmed operation after stock is handled.
+When `reserve1` or an equivalent detail field explicitly says a SKU is out of stock, report shortage as a confirmed cause, list the affected SKU, recommend replenishment/inventory confirmation first, and only mention reopen-for-allocation retry as a later allocation operation after stock is handled.
 
 ## Independent Execution Contract
 

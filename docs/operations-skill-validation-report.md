@@ -16,14 +16,14 @@ Scope: `skills/operations` only.
 
 ## Fixes Applied
 
-- Rewrote `skills/operations/scripts/reopen_order.py` to remove corrupted prompt text and add a business summary.
+- Reopen ownership moved to `allocation`; operations no longer owns `reopen_order.py`.
 - Enhanced `skills/operations/scripts/cancel_order.py` to:
   - summarize success/fail/ongoing rows,
   - post-check sales order detail,
   - summarize dispatch cancel status,
   - treat `ongoingRespDTOS` as downstream processing, not completion,
   - report already-cancelled orders as rejected submission but cancelled current state when post-check proves it.
-- Rewrote `skills/operations/scripts/batch_orders.py` so operations owns batch `cancel` and `reopen` only.
+- Rewrote `skills/operations/scripts/batch_orders.py` so operations owns batch `cancel` only.
 - Removed release-hold ownership from operations documentation; hold release belongs to `hold`.
 - Rewrote `skills/operations/SKILL.md` to remove乱码 and remove allocation/hold conflicts.
 
@@ -36,7 +36,7 @@ Operations can independently complete:
 - Interpret cancel `successRespDTOS`, `failRespDTOS`, and `ongoingRespDTOS`.
 - Re-check sales order and dispatch state after cancel.
 - Explain OMS rejection in business language.
-- Batch cancel/reopen with per-order outcomes.
+- Batch cancel with per-order outcomes.
 
 Operations must not:
 

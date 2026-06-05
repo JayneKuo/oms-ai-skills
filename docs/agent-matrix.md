@@ -30,7 +30,7 @@ Allowed re-query cases:
 
 1. Required fields are missing from `orderContext`, such as `orderDispatchList`, `itemLines`, current `status`, address, or SKU fields.
 2. The prior context is stale for the requested decision, for example the user asks for latest status after a delay.
-3. A write operation just occurred, such as cancel, reopen, release hold, manual allocation, or PO creation, and a post-write status check is required.
+3. A write operation just occurred, such as cancel, reopen-for-allocation retry, release hold, manual allocation, or PO creation, and a post-write status check is required.
 4. The later agent needs a domain-specific evidence endpoint that is not in context, such as dispatch explain logs, hold-rule logs, routing rules, allocation items, or PO recommendation evidence.
 
 Forbidden loop:
@@ -57,10 +57,10 @@ Recommended shared context shape:
 | Agent | Owns | Independent scripts / evidence | Write ability | Required user-facing output | Handoff target |
 | --- | --- | --- | --- | --- | --- |
 | `query` | Order list, exact detail fallback, basic status, test order creation | `query_orders.py`, `get_order_detail.py`, `create_order.py` | Test-order creation only after second confirmation | Order exists/status/stage, confirmed facts, business summary, next focused agent if deeper analysis is needed | `exception`, `hold`, `allocation`, `operations`, `replenishment` |
-| `allocation` | Warehouse result, automatic/manual allocation reason, remaining qty, manual allocation eligibility, batch allocation workflows | `explain_warehouse_assignment.py`, `get_allocation_items.py`, `check_manual_allocation.py`, `get_order_detail.py`, `get_routing_rules.py`, `manual_allocate.py`, `batch_allocation.py`, dispatch explain endpoint | Manual/auto/force/batch allocation belongs to allocation; every real write requires second confirmation and precheck | Assigned warehouse, dispatch number/status, SKU qty, remaining qty, dispatch explain reason, confidence; batch replies include per-order state | `replenishment` if shortage needs PO; `operations` only for non-allocation order writes |
-| `exception` | EXCEPTION list/detail diagnosis and resolution recommendation | `query_orders.py`, `get_order_detail.py`, detail diagnosis fields, dispatch/allocation evidence when available | No | Whether still exception, evidence-backed cause or evidence gap, solution, next action | `operations` for reopen/cancel; `allocation` for allocation blockers; `replenishment` for shortage |
+| `allocation` | Warehouse result, automatic/manual allocation reason, remaining qty, manual allocation eligibility, reopen-for-allocation retry, batch allocation workflows | `explain_warehouse_assignment.py`, `get_allocation_items.py`, `check_manual_allocation.py`, `get_order_detail.py`, `get_routing_rules.py`, `manual_allocate.py`, `reopen_order.py`, `batch_allocation.py`, dispatch explain endpoint | Manual/auto/force/reopen/batch allocation belongs to allocation; every real write requires second confirmation and precheck | Assigned warehouse, dispatch number/status, SKU qty, remaining qty, dispatch explain reason, confidence; reopen replies include retry acceptance and post-retry allocation state; batch replies include per-order state | `replenishment` if shortage needs PO; `operations` only for cancel |
+| `exception` | EXCEPTION list/detail diagnosis and resolution recommendation | `query_orders.py`, `get_order_detail.py`, detail diagnosis fields, dispatch/allocation evidence when available | No | Whether still exception, evidence-backed cause or evidence gap, solution, next action | `allocation` for reopen retry/allocation blockers; `replenishment` for shortage; `operations` for cancel |
 | `hold` | ON_HOLD status, hold rule evidence, hold rule query/create draft, rule-to-order candidate mapping, release-hold assessment | `get_order_detail.py`, `get_hold_reason.py`, `release_hold.py`, `get_allocation_items.py`, `diagnose_hold.py`, `hold_rules.py`, `match_hold_rules_to_orders.py`, ORDER_HOLD_OR rule execution when available | Release script exists; hold rule create exists but defaults to dry-run; every real hold write requires second confirmation | Hold status, matched rule/log if available, candidate/historical rule matches with evidence boundary, rule summary, release result, allocation-vs-hold blocker distinction | `operations` only for non-hold order writes; `allocation` if remaining/allocation is the blocker |
-| `operations` | High-impact non-allocation cancel/reopen and async result interpretation | `get_order_detail.py`, `cancel_order.py`, `reopen_order.py`, `batch_orders.py` | Yes, only after user second confirmation; no allocation writes and no hold-release writes | Submitted/completed/ongoing result, what is confirmed, downstream/WMS follow-up, rejection reason, post-cancel dispatch state | Back to `allocation`/`hold` for domain-specific post-checks |
+| `operations` | High-impact non-allocation cancel and async result interpretation | `get_order_detail.py`, `cancel_order.py`, `batch_orders.py` | Yes, only after user second confirmation; no allocation/reopen writes and no hold-release writes | Submitted/completed/ongoing result, what is confirmed, downstream/WMS follow-up, rejection reason, post-cancel dispatch state | Back to `allocation`/`hold` for domain-specific post-checks |
 | `replenishment` | Replenishment recommendation, purchase warehouse explanation, single/split PO creation | `get_order_detail.py`, `suggest_purchase_order.py`, `get_routing_rules.py`, `create_purchase_order.py`, `create_purchase_order_split.py` | PO creation after second confirmation | Recommended warehouse, evidence, alternatives, name-confirmation need, PO number/status after creation, inventory-not-yet-received boundary | `allocation` for sales-order warehouse reason; `operations` for order actions |
 | `order-orchestrator` | Intent routing, shared context reuse, and multi-agent workflow composition | No direct scripts; uses focused agents | No direct writes | Merged business answer: result, reason, solution, next step, evidence boundaries | Focused agents only |
 
@@ -69,11 +69,12 @@ Recommended shared context shape:
 | Business stage | First agent | Required checks | Possible next agent |
 | --- | --- | --- | --- |
 | User asks "where is this order?" | `query` | Detail lookup; translate status | `allocation` if warehouse reason is requested |
-| Order is `WAREHOUSE_PROCESSING` / dispatched | `allocation` | Dispatch detail, dispatch explain log, remaining qty | `operations` for cancel/reopen only; `replenishment` if stock issue |
-| Order is `EXCEPTION` | `exception` | List/detail freshness, evidence fields, solution path | `operations`, `allocation`, `replenishment` |
+| Order is `WAREHOUSE_PROCESSING` / dispatched | `allocation` | Dispatch detail, dispatch explain log, remaining qty | `operations` for cancel only; `replenishment` if stock issue |
+| Order is `EXCEPTION` | `exception` | List/detail freshness, evidence fields, solution path | `replenishment`, `allocation`, `operations` |
 | Order is `ON_HOLD` | `hold` | Detail status, hold rule/log, candidate rule mapping, release result, remaining qty | `operations`, `allocation` |
 | User asks about hold rules | `hold` | Rule list/get/active-count; candidate order matching if requested | `order-orchestrator` for summary only |
-| User asks to cancel/reopen/batch | `operations` | Confirmation, execute, follow-up detail/status, dispatch cancel status | `query`, `allocation` |
+| User asks to reopen/retry allocation | `allocation` | Confirmation, execute, post-reopen detail/allocation status | `exception`, `replenishment` |
+| User asks to cancel/batch cancel | `operations` | Confirmation, execute, follow-up detail/status, dispatch cancel status | `query`, `allocation` |
 | User asks "need replenishment / create PO" | `replenishment` | SKU/qty, warehouse recommendation, routing context, confirmation | `allocation` after inventory arrives |
 | Multi-step request | `order-orchestrator` | Route in business order; no direct API calls | Any focused agent |
 
@@ -86,7 +87,8 @@ Recommended shared context shape:
 | Hold needs release assessment | Reuse `orderContext.detail`; fetch only hold rule evidence and allocation items if missing. |
 | Hold needs rule query/create | Use `hold_rules.py`; create stays dry-run unless the user gives second confirmation for a real submit. |
 | Hold needs "which orders by rule" | Use direct hold records/logs if available; otherwise use candidate matching and label the evidence boundary. |
-| Operations is asked to cancel/reopen | Reuse prior detail for pre-check/risk message; re-query only after the write. |
+| Allocation is asked to reopen/retry allocation | Reuse prior detail for pre-check/risk message; re-query only after the write. |
+| Operations is asked to cancel | Reuse prior detail for pre-check/risk message; re-query only after the write. |
 | Replenishment follows exception/allocation | Reuse SKU/order context; fetch PO-specific recommendation evidence only. |
 | Any write completes or returns ongoing | Mark context as state-changing and require post-write re-query before final completion claim. |
 
@@ -109,7 +111,7 @@ An agent is considered independent only if it has all of these:
 | `allocation` | Ready | Automatic allocation reason now comes from dispatch explain logs before fallback evidence. |
 | `exception` | Ready with guardrails | Can list/detail exceptions; should not execute reopen itself. |
 | `hold` | Ready with caution | Can diagnose/release/query rules/draft rules/map candidate rule matches; must not overstate `data=false`, candidate matches, or unconfirmed hold causes. |
-| `operations` | Ready for controlled use | Requires confirmation; cancel now post-checks sales order and dispatch state; release hold belongs to `hold`. |
+| `operations` | Ready for controlled use | Requires confirmation; cancel now post-checks sales order and dispatch state; release hold belongs to `hold`; reopen-for-allocation belongs to `allocation`. |
 | `replenishment` | Ready with caution | Single and split PO creation work; recommendation explains warehouse ID/name uncertainty and routing context. |
 | `order-orchestrator` | Ready as router | No direct scripts by design; corrected ownership for hold release, allocation writes, and operations writes. |
 

@@ -10,6 +10,7 @@ Diagnose sales order allocation and warehouse assignment issues.
 - User asks why an order was assigned to a warehouse.
 - User asks whether manual allocation is possible.
 - User asks why manual allocation is blocked.
+- User asks to reopen an EXCEPTION order so it can retry allocation/dispatch.
 
 ## Corresponding Skill
 
@@ -18,8 +19,8 @@ Diagnose sales order allocation and warehouse assignment issues.
 ## Boundaries
 
 Manual dispatch modes must be distinguished clearly: `HAND_WHOLE_DISPATCH` manually assigns the whole order to a specified warehouse; `HAND_SKU_DISPATCH` manually assigns SKU quantities to specified warehouse(s); `HAND_WHOLE_AUTO_DISPATCH` asks OMS to auto-dispatch the whole order; `HAND_SKU_AUTO_DISPATCH` asks OMS to auto-dispatch selected SKU quantities. Do not describe auto-dispatch as a forced warehouse assignment.
-Warehouse-assignment reasons must be based on allocation, dispatch explain logs, route execution logs, or explicit dispatch evidence. Do not infer reasons from final warehouse/status fields alone. Manual/auto/force allocation execution belongs to this allocation agent, with user second confirmation before any write.
-Read-only allocation checks/explanations run directly. Any real manual/auto/force/batch allocation write must require user second confirmation before execution.
+Warehouse-assignment reasons must be based on allocation, dispatch explain logs, route execution logs, or explicit dispatch evidence. Do not infer reasons from final warehouse/status fields alone. Manual/auto/force allocation and reopen-for-allocation retry execution belong to this allocation agent, with user second confirmation before any write.
+Read-only allocation checks/explanations run directly. Any real manual/auto/force/reopen/batch allocation write must require user second confirmation before execution.
 After a manual or auto dispatch request succeeds, do not answer with only "submitted" or "success". Use the script's `postAllocationCheck` to tell the user the actual warehouse, dispatch number/status, allocated SKU quantities, remaining quantity, and whether the reason is confirmed.
 
 ## Warehouse Explanation Output Contract
@@ -51,8 +52,9 @@ Own scripts:
 - `skills/allocation/scripts/get_routing_rules.py`
 - `skills/allocation/scripts/manual_allocate.py`
 - `skills/allocation/scripts/batch_allocation.py`
+- `skills/allocation/scripts/reopen_order.py`
 
-This agent must independently answer where the order was allocated, why it was allocated there when dispatch explain logs exist, whether remaining quantity is available, and whether manual/auto dispatch is eligible. It also owns confirmed allocation writes so operations does not duplicate or conflict with allocation behavior.
+This agent must independently answer where the order was allocated, why it was allocated there when dispatch explain logs exist, whether remaining quantity is available, whether manual/auto dispatch is eligible, and whether an EXCEPTION order can be reopened to retry allocation. It also owns confirmed allocation/reopen-dispatch writes so operations does not duplicate or conflict with allocation behavior.
 
 In orchestrated workflows, reuse `orderContext.detail` when provided. Fetch only missing allocation evidence such as dispatch explain logs, allocation items, routing rules, or manual allocation eligibility. Do not repeat `get_order_detail.py` unless the context is missing required fields or stale after a write.
 

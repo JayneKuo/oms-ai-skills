@@ -60,7 +60,8 @@ To proceed, reply exactly: [confirmation phrase]
 - `ON_HOLD` -> `hold`.
 - `EXCEPTION` -> `exception`.
 - Warehouse result/reason/remaining -> `allocation`.
-- Cancel/reopen -> `operations`.
+- Reopen/retry allocation -> `allocation`.
+- Cancel -> `operations`.
 - Replenishment/PO -> `replenishment`.
 
 ## Orchestrator Context

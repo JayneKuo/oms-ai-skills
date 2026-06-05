@@ -1,17 +1,17 @@
 ---
 name: operations
-description: Execute high-impact non-allocation OMS sales-order operations, mainly cancel and reopen, after user second confirmation. Use when the user asks to cancel or reopen one or more orders, or asks for batch cancel/reopen. Distinguish API acceptance, downstream ongoing processing, rejection, and final business state.
+description: Execute high-impact non-allocation OMS sales-order operations, mainly cancel, after user second confirmation. Use when the user asks to cancel one or more orders or asks for batch cancel. Distinguish API acceptance, downstream ongoing processing, rejection, and final business state.
 ---
 
 # Operations Skill
 
 ## Runtime Guardrails
 
-- Use this skill for high-impact non-allocation writes: cancel, reopen, and batch cancel/reopen.
-- Read-only pre-checks may run directly. Every real cancel/reopen/batch cancel/reopen write must require user second confirmation before execution.
+- Use this skill for high-impact non-allocation writes: cancel and batch cancel.
+- Read-only pre-checks may run directly. Every real cancel/batch cancel write must require user second confirmation before execution.
 - Always require user second confirmation before writes. The confirmation prompt must include environment, operation, target order(s), business risk, and the exact confirmation phrase.
 - Do not diagnose ON_HOLD, EXCEPTION, allocation reason, or replenishment from scratch. Ask the relevant focused skill to provide diagnosis first.
-- Do not execute manual allocation, auto allocation, force allocation, allocation precheck, or allocation explanation. All allocation reads/writes are owned by `allocation`.
+- Do not execute manual allocation, auto allocation, force allocation, reopen-for-allocation retry, allocation precheck, or allocation explanation. All allocation/dispatch retry reads and writes are owned by `allocation`.
 - Do not release hold here. Hold release belongs to `hold`, because it requires hold-rule evidence, latest ON_HOLD status, and post-release hold checks.
 - After execution, distinguish API acceptance from completed business outcome. Never call a submitted/ongoing request "fully successful" until a follow-up status check proves it.
 - Cancel with dispatch/WMS records may return `ongoingRespDTOS`. Treat this as downstream Kafka/WMS cancellation in progress, not final success.
@@ -38,10 +38,8 @@ After execution:
 
 ```bash
 python scripts/get_order_detail.py --order SO00361770
-python scripts/reopen_order.py --order SO00361770 --confirm-reopen
 python scripts/cancel_order.py --orders SO00361770 --confirm-cancel
 python scripts/cancel_order.py --orders SO001 SO002 --post-check-delay 3 --confirm-cancel
-python scripts/batch_orders.py --action reopen --orders SO001 SO002 --confirm-execute
 python scripts/batch_orders.py --action cancel --orders SO001 SO002 --confirm-execute
 ```
 
@@ -50,9 +48,9 @@ python scripts/batch_orders.py --action cancel --orders SO001 SO002 --confirm-ex
 ```text
 This is a real OMS action, so I will not execute it yet.
 Environment: [staging/production]
-Operation: [cancel/reopen]
+Operation: [cancel]
 Targets: [order list]
-Risk: [the order may stop fulfillment, trigger downstream WMS/dispatch cancellation, or re-enter processing after reopen]
+Risk: [the order may stop fulfillment or trigger downstream WMS/dispatch cancellation]
 To proceed, reply exactly: [confirmation phrase]
 ```
 
@@ -64,15 +62,10 @@ To proceed, reply exactly: [confirmation phrase]
 - Sales order `CANCELLED` plus cancelled dispatch records means cancellation is confirmed.
 - Sales order `CANCELLED` but dispatch still active means sales order cancellation is visible, but downstream cancellation is not fully confirmed.
 
-## Reopen Result Rules
-
-- Reopen applies to EXCEPTION workflows. If OMS says `Order not exception`, translate it as "the current status does not support reopen."
-- `code=0` means the request was accepted, not necessarily that downstream status is fully recovered.
-- Re-check order detail before claiming final recovery.
-
 ## Forbidden
 
 - Do not perform allocation under operations.
+- Do not perform reopen-for-allocation retry under operations; route it to allocation.
 - Do not release hold under operations.
 - Do not call accepted/ongoing cancel "successful" before post-check.
 - Do not expose credentials or full raw payloads by default.

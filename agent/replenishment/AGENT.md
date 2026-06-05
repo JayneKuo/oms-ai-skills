@@ -20,7 +20,7 @@ Sales-order-related replenishment and purchase order agent.
 
 This agent only describes and routes replenishment work. Implementation details, scripts, recommendation evidence, PO creation, and user-facing templates live in the corresponding skill folder.
 
-Do not diagnose ON_HOLD, explain sales-order warehouse assignment, or execute cancel/reopen actions here.
+Do not diagnose ON_HOLD, explain sales-order warehouse assignment, execute cancel actions, or execute reopen-for-allocation retry here.
 
 If OMS returns only a warehouse ID for recommendation, say the display name needs confirmation. If the user specifies a warehouse name, preserve it but still make clear that OMS must accept the warehouse name at PO creation time.
 

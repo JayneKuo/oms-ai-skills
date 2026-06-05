@@ -16,7 +16,7 @@ This runbook defines how the split OMS agents and skills should behave in produc
 | Dry-run, preview, or draft | Run directly and explicitly say nothing was submitted to OMS. |
 | Real write/action | Stop and ask for user second confirmation before execution. |
 
-Real write/action includes test order creation, cancel, reopen, release hold, manual allocation, auto allocation, force allocation, batch allocation, hold rule create/enable/update, PO creation, and split PO creation.
+Real write/action includes test order creation, cancel, reopen-for-allocation retry, release hold, manual allocation, auto allocation, force allocation, batch allocation, hold rule create/enable/update, PO creation, and split PO creation.
 
 The confirmation prompt must include:
 
@@ -33,8 +33,8 @@ The confirmation prompt must include:
 | "Find this order", "what status is it", "does it exist" | `query` | Fast base lookup and status translation. | Deep root-cause diagnosis or writes. |
 | "Why is this order in EXCEPTION", "how do I fix this exception" | `exception` | Owns exception cause, solution, and next action. | Reopen/cancel/create PO directly. |
 | "Why is this ON_HOLD", "which hold rule", "show hold rules", "create hold rule" | `hold` | Owns hold evidence, rule lookup, rule-to-order mapping, release assessment, and rule drafts. | Allocation or operations writes. |
-| "Where was it allocated", "why this warehouse", "can I allocate", "auto/manual allocate" | `allocation` | Owns allocation result, dispatch explain logs, remaining quantity, and allocation writes. | Cancel/reopen or PO creation. |
-| "Cancel this order", "reopen this order", "batch cancel/reopen" | `operations` | Owns high-impact non-allocation order writes and downstream state interpretation. | Hold release, allocation, replenishment. |
+| "Where was it allocated", "why this warehouse", "can I allocate", "auto/manual allocate", "reopen this exception order to retry allocation" | `allocation` | Owns allocation result, dispatch explain logs, remaining quantity, reopen-for-allocation retry, and allocation writes. | Cancel or PO creation. |
+| "Cancel this order", "batch cancel" | `operations` | Owns high-impact non-allocation cancel writes and downstream state interpretation. | Hold release, allocation, replenishment, reopen. |
 | "Do we need replenishment", "which purchase warehouse", "create PO/split PO" | `replenishment` | Owns replenishment recommendation and PO creation. | Explain sales-order allocation reason. |
 | Multi-step order request | `order-orchestrator` | Routes in business-process order and passes shared context. | Direct OMS API calls. |
 
@@ -47,7 +47,7 @@ When the user gives a broad or multi-step request, follow this order:
 3. `exception`: if status is `EXCEPTION` or the user asks about exception cause.
 4. `allocation`: if warehouse, dispatch, remaining quantity, or allocation eligibility is involved.
 5. `replenishment`: if shortage/SKU quantity/PO is involved.
-6. `operations`: only for confirmed cancel/reopen workflow.
+6. `operations`: only for confirmed cancel workflow.
 
 Do not move to a write agent until the read/diagnosis agent has explained the current state and the user has provided second confirmation for the write.
 
@@ -109,7 +109,7 @@ For real write requests before execution:
 ```text
 This is a real OMS action, so I will not execute it yet.
 Environment: [staging/production]
-Operation: [cancel/reopen/release hold/allocation/create PO/etc.]
+Operation: [cancel/reopen allocation retry/release hold/allocation/create PO/etc.]
 Targets: [orders/rules/SKUs/warehouses]
 Risk: [business impact and downstream impact]
 To proceed, reply exactly: [confirmation phrase]

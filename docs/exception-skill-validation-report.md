@@ -30,7 +30,7 @@ Exception can independently complete:
 - Diagnose one or more orders.
 - Detect stale list rows whose detail status changed.
 - Confirm out-of-stock exceptions from detail evidence.
-- Separate shortage follow-up (`replenishment`) from retry/reopen follow-up (`operations`).
+- Separate shortage follow-up (`replenishment`) from retry/reopen follow-up (`allocation`).
 
 Exception must not:
 

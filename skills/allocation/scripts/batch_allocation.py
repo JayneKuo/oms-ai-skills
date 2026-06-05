@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import oms_client
 import explain_warehouse_assignment as explainer
 import manual_allocate as manual
+import reopen_order as allocation_reopen
 
 
 def parse_orders(args):
@@ -186,6 +187,15 @@ def run_one(order_no, args):
             result = summarize_check(order_no)
         elif args.action == "manual_allocate":
             result = summarize_manual_allocate(order_no, args)
+        elif args.action == "reopen":
+            response = oms_client.post(f"/api/linker-oms/opc/app-api/sale-order/reopen/{order_no}")
+            result = {
+                "orderNo": order_no,
+                "state": "accepted" if isinstance(response, dict) and response.get("code") == 0 and response.get("data") is not False else "rejected",
+                "submittedToOms": True,
+                "businessSummary": allocation_reopen.summarize_reopen(order_no, response if isinstance(response, dict) else {}),
+                "postReopenCheck": allocation_reopen.post_reopen_check(order_no),
+            }
         else:
             raise ValueError(f"Unsupported action: {args.action}")
         result["durationMs"] = int((time.perf_counter() - started) * 1000)
@@ -214,7 +224,7 @@ def build_batch_summary(results):
 def main():
     parser = argparse.ArgumentParser()
     oms_client.add_config_arg(parser)
-    parser.add_argument("--action", required=True, choices=["explain", "items", "check", "manual_allocate"])
+    parser.add_argument("--action", required=True, choices=["explain", "items", "check", "manual_allocate", "reopen"])
     parser.add_argument("--orders", nargs="*", default=[])
     parser.add_argument("--orders-file", default=None)
     parser.add_argument("--max-workers", type=int, default=4)
@@ -237,7 +247,7 @@ def main():
     orders = parse_orders(args)
     if not orders:
         parser.error("--orders or --orders-file is required")
-    if args.action == "manual_allocate" and not args.confirm_allocation:
+    if args.action in ("manual_allocate", "reopen") and not args.confirm_allocation:
         print(json.dumps({
             "code": "CONFIRMATION_REQUIRED",
             "_env": oms_client.get_env_label(),
@@ -245,7 +255,7 @@ def main():
             "_request": {
                 "submittedToOms": False,
                 "requiredConfirmationFlag": "--confirm-allocation",
-                "operation": "batch_allocation",
+                "operation": "batch_allocation" if args.action == "manual_allocate" else "batch_reopen_for_allocation_retry",
                 "orders": orders,
                 "dispatchType": args.dispatch_type,
                 "warehouse": args.warehouse,

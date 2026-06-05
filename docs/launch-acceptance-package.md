@@ -35,7 +35,7 @@ Production write policy: read-only actions may run directly; dry-run/draft actio
 | `exception` | EXCEPTION diagnosis, stale-status detection, out-of-stock routing, batch diagnosis | None | Ready |
 | `hold` | ON_HOLD diagnosis, release hold, hold rule list/get/active-count, rule-to-order candidate mapping, natural-language rule draft/create | Release hold and hold rule create after second confirmation | Ready with caveats |
 | `allocation` | Allocation result/reason, dispatch explain, remaining qty, manual allocation eligibility, batch allocation, allocation writes | Manual/auto/batch allocation after second confirmation and precheck | Ready |
-| `operations` | Cancel/reopen, batch cancel/reopen, downstream/WMS cancel post-check, rejection interpretation | Cancel/reopen after second confirmation | Ready |
+| `operations` | Cancel, batch cancel, downstream/WMS cancel post-check, rejection interpretation | Cancel after second confirmation | Ready |
 | `replenishment` | Replenishment recommendation, warehouse evidence, single/split PO creation | PO creation after second confirmation | Ready with caveats |
 | `order-orchestrator` | Intent routing, shared `orderContext` reuse, multi-step composition | No direct writes | Ready |
 
@@ -43,7 +43,7 @@ Production write policy: read-only actions may run directly; dry-run/draft actio
 
 - `release hold` belongs to `hold`, not `operations`.
 - `manual/auto/force/batch allocation` belongs to `allocation`, not `operations`.
-- `cancel/reopen` belongs to `operations`.
+- `cancel` belongs to `operations`; `reopen-for-allocation retry` belongs to `allocation`.
 - `hold rule query/create` belongs to `hold`.
 - `PO/replenishment` belongs to `replenishment`.
 - `sales-order` legacy must not be used as a hidden dependency for split-agent workflows.

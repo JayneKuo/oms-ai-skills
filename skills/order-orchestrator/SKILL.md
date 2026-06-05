@@ -22,8 +22,8 @@ description: Coordinate split OMS order skills. Use as the default order entry p
 1. Status/list/detail only: `query`.
 2. EXCEPTION cause or solution: `exception`.
 3. ON_HOLD, hold rule, hold rule management, release hold: `hold`.
-4. Warehouse allocation result/reason, remaining quantity, manual/auto/force allocation, batch allocation: `allocation`.
-5. Cancel, reopen, non-allocation batch cancel/reopen: `operations`.
+4. Warehouse allocation result/reason, remaining quantity, reopen-for-allocation retry, manual/auto/force allocation, batch allocation: `allocation`.
+5. Cancel and batch cancel: `operations`.
 6. Replenishment, recommended purchase warehouse, PO creation: `replenishment`.
 
 ## Ownership Boundaries
@@ -31,8 +31,8 @@ description: Coordinate split OMS order skills. Use as the default order entry p
 - `query` owns base lookup and test-order creation only.
 - `exception` owns exception cause/solution diagnosis only.
 - `hold` owns hold evidence, hold rule query/create draft, rule-to-order candidate mapping, and release hold.
-- `allocation` owns allocation evidence, allocation explanation, remaining quantity, and allocation writes.
-- `operations` owns cancel and reopen only; it does not own hold release or allocation.
+- `allocation` owns allocation evidence, allocation explanation, remaining quantity, reopen-for-allocation retry, and allocation writes.
+- `operations` owns cancel only; it does not own reopen, hold release, or allocation.
 - `replenishment` owns replenishment recommendation and PO creation; it does not explain sales-order allocation reasons.
 
 ## Shared Context Rules

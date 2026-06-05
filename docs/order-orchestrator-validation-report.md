@@ -11,7 +11,7 @@ Scope: `skills/order-orchestrator` and `agent/order-orchestrator`.
 | "查一下 SO01405073 状态" | `query` | Query returns status only. No downstream skill needed. |
 | "SO01392133 为什么分到 Valley View" | `query -> allocation` | Query fetches detail once; allocation fetches dispatch explain logs and allocation items only. |
 | "SO01376525 为什么 ON_HOLD / 哪条规则" | `query -> hold` or direct `hold` | Hold owns hold evidence, rule lookup, candidate rule mapping, and release hold. |
-| "取消 SO01405073" | `operations` | Operations owns cancel/reopen; it post-checks sales order and dispatch state after write. |
+| "取消 SO01405073" | `operations` | Operations owns cancel; it post-checks sales order and dispatch state after write. |
 | "释放 hold 后看看还有没有商品能分仓" | `hold -> allocation` | Hold releases/checks hold; allocation checks remaining/allocation. Operations is not involved. |
 | "异常缺货就补货" | `query -> exception -> replenishment` | Exception diagnoses shortage; replenishment uses SKU/quantity context to recommend/create PO. |
 | "手动分仓/自动分仓/批量分仓" | `allocation` | Allocation owns all allocation writes and batch allocation. |
@@ -25,7 +25,8 @@ Scope: `skills/order-orchestrator` and `agent/order-orchestrator`.
 - Corrected routing ownership:
   - release hold -> `hold`,
   - manual/auto/force/batch allocation -> `allocation`,
-  - cancel/reopen/batch cancel/reopen -> `operations`,
+  - cancel/batch cancel -> `operations`,
+  - reopen-for-allocation retry -> `allocation`,
   - PO/replenishment -> `replenishment`.
 - Clarified shared `orderContext` reuse and allowed re-query cases.
 - Added explicit rule: never use legacy `sales-order` as a hidden dependency for split-agent workflows.

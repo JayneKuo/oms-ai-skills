@@ -16,7 +16,7 @@ Legacy compatibility entry point: `sales-order`.
 | `exception` | EXCEPTION diagnosis and next-step planning | `query_orders.py`, `get_order_detail.py`, `diagnose_exception.py` | No | Ready with guardrails |
 | `hold` | ON_HOLD diagnosis, hold evidence, hold rule query, rule-to-order candidate mapping, release assessment, natural-language hold rule drafting | `get_order_detail.py`, `get_hold_reason.py`, `get_allocation_items.py`, `release_hold.py`, `diagnose_hold.py`, `hold_rules.py`, `match_hold_rules_to_orders.py` | Release hold exists; hold rule create exists but defaults to dry-run and requires second confirmation for real submit | Ready with caution |
 | `allocation` | Allocation result, automatic allocation reason, remaining quantity, manual-allocation eligibility, batch allocation workflows | `explain_warehouse_assignment.py`, `check_manual_allocation.py`, `get_allocation_items.py`, `manual_allocate.py`, `batch_allocation.py`, dispatch explain endpoint | Allocation reads and writes are owned here; writes require user second confirmation and precheck | Ready |
-| `operations` | High-impact non-allocation order writes: cancel and reopen | `get_order_detail.py`, `reopen_order.py`, `cancel_order.py`, `batch_orders.py` | Yes, only after second confirmation; no allocation or hold-release writes | Ready for controlled use |
+| `operations` | High-impact non-allocation order writes: cancel and batch cancel | `get_order_detail.py`, `cancel_order.py`, `batch_orders.py` | Yes, only after second confirmation; no allocation/reopen or hold-release writes | Ready for controlled use |
 | `replenishment` | Replenishment recommendation, purchase warehouse explanation, single/split PO creation | `get_order_detail.py`, `suggest_purchase_order.py`, `get_routing_rules.py`, `create_purchase_order.py`, `create_purchase_order_split.py` | PO creation only after second confirmation | Ready with caution |
 | `order-orchestrator` | Routing, shared context reuse, and multi-step composition | No direct scripts | No direct writes | Ready as default entry |
 
@@ -138,7 +138,7 @@ Use for:
 
 - Reopen.
 - Cancel.
-- Batch cancel/reopen.
+- Batch cancel.
 - Non-allocation high-impact writes only; allocation execution belongs to `allocation`.
 - Interpreting async/submitted operation outcomes.
 - Confirming downstream cancel state by re-reading sales order and dispatch records.
@@ -220,5 +220,5 @@ Routing priorities:
 2. EXCEPTION cause/solution: `exception`.
 3. ON_HOLD/hold rule/release hold: `hold`.
 4. Allocation result/reason/remaining: `allocation`.
-5. Cancel/reopen/batch/confirmed writes: `operations`.
+5. Cancel/batch cancel confirmed writes: `operations`; reopen-for-allocation retry: `allocation`.
 6. Replenishment/recommended PO warehouse/PO creation: `replenishment`.

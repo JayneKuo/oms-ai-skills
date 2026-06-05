@@ -125,7 +125,7 @@ Production write policy:
    - Rewrote `skills/query/SKILL.md`, `query_orders.py`, `get_order_detail.py`, `create_order.py`, and query evals.
    - Rewrote `skills/order-orchestrator/SKILL.md` and `agent/order-orchestrator/AGENT.md`.
    - Query now returns business summaries, exact-detail fallback, and next focused skill.
-   - Orchestrator now routes release hold to `hold`, allocation writes to `allocation`, cancel/reopen to `operations`, and PO workflows to `replenishment`.
+   - Current ownership update: orchestrator routes release hold to `hold`, allocation writes and reopen-for-allocation retry to `allocation`, cancel to `operations`, and PO workflows to `replenishment`.
 
 ## Skill Capability Inventory
 

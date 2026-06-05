@@ -1,10 +1,9 @@
 """
 Batch high-impact sales order operations.
 
-Operations owns cancel and reopen. Release hold belongs to the hold skill.
+Operations owns cancel only. Reopen/retry allocation belongs to the allocation skill.
 
 Usage:
-  python batch_orders.py --action reopen --orders SO001 SO002 SO003 --confirm-execute
   python batch_orders.py --action cancel --orders SO001 SO002 --confirm-execute
 """
 import argparse
@@ -17,17 +16,6 @@ import time
 sys.path.insert(0, os.path.dirname(__file__))
 import cancel_order
 import oms_client
-
-
-def reopen(order_no):
-    result = oms_client.post(f"/api/linker-oms/opc/app-api/sale-order/reopen/{order_no}")
-    ok = result.get("code") == 0 and result.get("data") is not False
-    return {
-        "orderNo": order_no,
-        "ok": ok,
-        "businessResult": "accepted" if ok else "rejected",
-        "result": result,
-    }
 
 
 def cancel_many(order_nos, post_check_delay=1.0):
@@ -76,11 +64,11 @@ def cancel_many(order_nos, post_check_delay=1.0):
 def main():
     parser = argparse.ArgumentParser()
     oms_client.add_config_arg(parser)
-    parser.add_argument("--action", required=True, choices=["reopen", "cancel"])
+    parser.add_argument("--action", required=True, choices=["cancel"])
     parser.add_argument("--orders", nargs="+", required=True, help="One or more order numbers")
     parser.add_argument("--max-workers", type=int, default=4)
     parser.add_argument("--post-check-delay", type=float, default=1.0)
-    parser.add_argument("--confirm-execute", action="store_true", help="Required to submit real batch cancel/reopen requests to OMS.")
+    parser.add_argument("--confirm-execute", action="store_true", help="Required to submit real batch cancel requests to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
@@ -91,7 +79,7 @@ def main():
             "_request": {
                 "submittedToOms": False,
                 "requiredConfirmationFlag": "--confirm-execute",
-                "operation": f"batch_{args.action}",
+                "operation": "batch_cancel",
                 "orders": args.orders,
             },
             "businessSummary": {
@@ -115,28 +103,6 @@ def main():
         }
         print(json.dumps(output, indent=2, ensure_ascii=False))
         return
-
-    workers = max(1, min(args.max_workers, 8, len(args.orders)))
-    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        results = list(executor.map(reopen, args.orders))
-    for item in results:
-        print(f"[{item['orderNo']}] {'OK' if item['ok'] else 'FAILED'}", file=sys.stderr)
-    success = sum(1 for item in results if item["ok"])
-    print(
-        json.dumps(
-            {
-                "action": args.action,
-                "total": len(results),
-                "success": success,
-                "failed": len(results) - success,
-                "results": results,
-                "_env": oms_client.get_env_label(),
-            },
-            indent=2,
-            ensure_ascii=False,
-        )
-    )
-
 
 if __name__ == "__main__":
     main()
