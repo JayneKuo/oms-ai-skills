@@ -1,0 +1,15 @@
+{
+  "skill_name": "purchase-replenishment",
+  "evals": [
+    {
+      "id": "recommend_purchase_warehouse_with_reason",
+      "prompt": "帮我给 BATESTSKU-1 补货 100EA，推荐仓库",
+      "expected_output": "应给出推荐仓库，并说明推荐原因来自可用仓库、routing、WMS/fulfillment 可用性、优先级或用户条件；不能只报仓库名。"
+    },
+    {
+      "id": "create_purchase_order_business_summary",
+      "prompt": "给 Valley View 创建 BATESTSKU-1 采购单 100EA",
+      "expected_output": "应创建采购单后返回 PO 单号、SKU、数量、仓库、业务状态解释和下一步。"
+    }
+  ]
+}

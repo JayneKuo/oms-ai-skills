@@ -1,0 +1,20 @@
+{
+  "skill_name": "order-query",
+  "evals": [
+    {
+      "id": "query_order_status_business_summary",
+      "prompt": "查一下订单 SO00361770 当前状态",
+      "expected_output": "Must fetch order detail, explain current status in business language, provide confirmed facts and next step, and avoid writes or deep diagnosis."
+    },
+    {
+      "id": "query_exception_list_lightweight",
+      "prompt": "查一个 EXCEPTION 订单",
+      "expected_output": "Must return a representative exception order list and say root-cause diagnosis should continue in the exception skill."
+    },
+    {
+      "id": "exact_order_fallback",
+      "prompt": "查询 SO01405073",
+      "expected_output": "Must use exact detail fallback if page query returns no rows and must not say the order does not exist prematurely."
+    }
+  ]
+}

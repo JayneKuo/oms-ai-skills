@@ -1,0 +1,10 @@
+{
+  "skill_name": "exception",
+  "evals": [
+    {
+      "id": "exception_requires_cause_solution_next_step",
+      "prompt": "这个 EXCEPTION 订单为什么异常，怎么处理？",
+      "expected_output": "必须基于真实订单详情、diagnosis、availableActions、recommendedNextStep、inventorySummary 或日志证据给出原因、解决方案和下一步；不能只返回 EXCEPTION 状态。"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "skill_name": "order-orchestrator",
+  "evals": [
+    {
+      "id": "route_status_query",
+      "prompt": "查一下 SO00361770 当前状态",
+      "expected_output": "应路由到 query 能力，返回业务化状态说明和下一步，不做深度诊断或写操作。"
+    },
+    {
+      "id": "route_on_hold_diagnosis",
+      "prompt": "SO00361770 为什么 ON_HOLD，能不能释放？",
+      "expected_output": "应路由到 hold 能力，要求基于规则/日志证据说明原因、解决方案和下一步。"
+    },
+    {
+      "id": "route_replenishment",
+      "prompt": "帮我给 BATESTSKU-1 补货并推荐仓库",
+      "expected_output": "应路由到 replenishment 能力，说明推荐仓和推荐原因，并要求用户确认后再创建采购单。"
+    },
+    {
+      "id": "route_high_risk_operation",
+      "prompt": "帮我取消 SO01390506",
+      "expected_output": "应路由到 operations 能力，先确认环境、操作、对象和风险，不能直接执行。"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "channelId": 1,
+  "inputConditions": {
+    "carrier": "FedEx",
+    "shipMethod": "Ground"
+  }
+}

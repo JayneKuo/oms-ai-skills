@@ -1,0 +1,226 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "默认模块",
+    "description": "提供管理员管理的所有功能",
+    "version": "1.0.0",
+    "contact": {},
+    "license": {}
+  },
+  "paths": {
+    "/iam/token": {
+      "post": {
+        "summary": "token",
+        "deprecated": false,
+        "description": "",
+        "operationId": "token",
+        "tags": [
+          "admin/iam"
+        ],
+        "parameters": [
+          {
+            "name": "USER",
+            "in": "header",
+            "description": "用于获取后端拦截器当前登录的username",
+            "required": true,
+            "example": "{{username}}",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apifoxToken",
+            "in": "header",
+            "description": "apifox 云端 mock 的必要数据",
+            "required": false,
+            "example": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY2xpZW50X2NhdGVnb3J5IjoxLCJkYXRhIjp7InRlbmFudF9pZCI6IkN1YmVzaGlwIiwidGVuYW50cyI6WyJDdWJlc2hpcCIsIlNCRkgiXSwidXNlcl9pZCI6IjE4MzQ5MDQ3ODA1MDg2OTY1NzciLCJ1c2VyX25hbWUiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY29tcGFueV9jb2RlIjoiQ3ViZXNoaXAiLCJyb2xlX2lkcyI6WyIxODM0ODM4NTkwNjkyMjAwNDUwIiwiMTg3MTEyMDg3NjI3NjA1MTk2OSIsIjE4Njg1NDc3Njc3Nzk1NDkxODYiLCIxODcxMTIwODc2Mjc2MDUxOTcwIiwiMTgyNTQ1Nzg2MTk1MzE2NzM2MiIsIjE4MzQ4Mzg1OTA2OTIyMDA0NDkiXX0sImlzcyI6Imh0dHBzOi8vaWQtZGV2Lml0ZW0ucHViIiwiY2xpZW50X2lkIjoiaWFtLWludGVybmFsIiwiYXVkIjoiaWFtLWludGVybmFsIiwibmJmIjoxNzQ3MTMwNTQwLCJncmFudF90eXBlIjoicmVmcmVzaF90b2tlbiIsInNjb3BlIjpbInByb2ZpbGUiXSwiZXhwIjoxNzQ3NzM1MzQwLCJpYXQiOjE3NDcxMzA1NDAsImNsaWVudF9uYW1lIjoiaWFtIiwianRpIjoiNDk5OTg4NmItNWIwOS00YTExLTk0MDktYTQ5ZGVlMGVmODM0In0.f7mYDEGCvp7GZ5S9rZ_zT3i4D3_h2BOlEpvthGTrHbEsCm1U-yGdwwW50Md-5pEODh0vaSKO8207A2b0i5MjC-U6s2OB95qIpnzSTw_a-SIaQfy2f3zBfCfWU5a4zJ9yFOssLSM_-L3UHPNyE26ocyv2p93-zHheFlVIfJBW9WkP5mb8e5BeZmYE7NXEJTCIKmcg29eDDx98Yt_rSsK1f6ZnOoexnAhzKk-KHWN02g-UpkNtDclAo5mhFGPSi51vPLyEKk5nMWIpOY3feZCV9_xsBuQ5zilPATHEEqzLsRnhQYq9fjN4VVq3QsndPe_3-pRoP6GCggH98IkJwGC9yg",
+            "schema": {
+              "type": "string",
+              "default": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY2xpZW50X2NhdGVnb3J5IjoxLCJkYXRhIjp7InRlbmFudF9pZCI6IkN1YmVzaGlwIiwidGVuYW50cyI6WyJDdWJlc2hpcCIsIlNCRkgiXSwidXNlcl9pZCI6IjE4MzQ5MDQ3ODA1MDg2OTY1NzciLCJ1c2VyX25hbWUiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY29tcGFueV9jb2RlIjoiQ3ViZXNoaXAiLCJyb2xlX2lkcyI6WyIxODM0ODM4NTkwNjkyMjAwNDUwIiwiMTg3MTEyMDg3NjI3NjA1MTk2OSIsIjE4Njg1NDc3Njc3Nzk1NDkxODYiLCIxODcxMTIwODc2Mjc2MDUxOTcwIiwiMTgyNTQ1Nzg2MTk1MzE2NzM2MiIsIjE4MzQ4Mzg1OTA2OTIyMDA0NDkiXX0sImlzcyI6Imh0dHBzOi8vaWQtZGV2Lml0ZW0ucHViIiwiY2xpZW50X2lkIjoiaWFtLWludGVybmFsIiwiYXVkIjoiaWFtLWludGVybmFsIiwibmJmIjoxNzQ3MTMwNTQwLCJncmFudF90eXBlIjoicmVmcmVzaF90b2tlbiIsInNjb3BlIjpbInByb2ZpbGUiXSwiZXhwIjoxNzQ3NzM1MzQwLCJpYXQiOjE3NDcxMzA1NDAsImNsaWVudF9uYW1lIjoiaWFtIiwianRpIjoiNDk5OTg4NmItNWIwOS00YTExLTk0MDktYTQ5ZGVlMGVmODM0In0.f7mYDEGCvp7GZ5S9rZ_zT3i4D3_h2BOlEpvthGTrHbEsCm1U-yGdwwW50Md-5pEODh0vaSKO8207A2b0i5MjC-U6s2OB95qIpnzSTw_a-SIaQfy2f3zBfCfWU5a4zJ9yFOssLSM_-L3UHPNyE26ocyv2p93-zHheFlVIfJBW9WkP5mb8e5BeZmYE7NXEJTCIKmcg29eDDx98Yt_rSsK1f6ZnOoexnAhzKk-KHWN02g-UpkNtDclAo5mhFGPSi51vPLyEKk5nMWIpOY3feZCV9_xsBuQ5zilPATHEEqzLsRnhQYq9fjN4VVq3QsndPe_3-pRoP6GCggH98IkJwGC9yg"
+            }
+          },
+          {
+            "name": "trace",
+            "in": "header",
+            "description": "强制 print trace log",
+            "example": "true",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "header",
+            "description": "",
+            "example": "{{tag}}",
+            "schema": {
+              "type": "string",
+              "default": "{{tag}}"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "example": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJsYW50ZXN0ZXJAaXRlbS5jb20iLCJjbGllbnRfY2F0ZWdvcnkiOjEsImRhdGEiOnsidGVuYW50X2lkIjoiTFQiLCJ0ZW5hbnRzIjpbIkJYWFgwMDA0IiwiTFQiLCJHZW5lcmFsTG9naXN0aWNzU3lzdGVtcyJdLCJ1c2VyX2lkIjoiMTg2MjAyNjgwNjY0MDM3Nzg1NyIsInVzZXJfbmFtZSI6ImxhbnRlc3RlckBpdGVtLmNvbSIsImNvbXBhbnlfY29kZSI6IkxUIiwicm9sZV9pZHMiOlsiMTk0ODIxNzQzMDYxMzQ4NzYxOCIsIjE4NTkxMTYyODcwMDExOTA0MDMiLCIxOTg5MTU3ODc1MjI5NDM3OTU0Il19LCJpc3MiOiJodHRwczovL2lkLXN0YWdpbmcuaXRlbS5jb20iLCJjbGllbnRfaWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJhdWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJuYmYiOjE3NjU5NjAyODIsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJwaG9uZSIsIm9wZW5pZCIsImVtYWlsIiwicHJvZmlsZSJdLCJleHAiOjE3NjYwNDY2ODIsImlhdCI6MTc2NTk2MDI4MiwiY2xpZW50X25hbWUiOiJvbXMtdjIiLCJqdGkiOiIyMTUwMWIyZi1lOTRlLTRhMDgtODMxOS01OGViODY0NTEwMjEifQ.cWR4DfoLX_3boBy_NBpjLy2KDDUcazBwB_LCaxdAucMo22_s6eMP88ZAH7kuN7OTjIy_V576d_VXOuPxZvvh8JPV1vUGp8-dtvJ30ypwPGJegFEZ52MO-moRFJIwksjfe7cVe_EYthfasQgJ3pY9v2nICTx1qHbb7sR7I7pF2aBD3hdB1zF7zSgPKX9-IO5p4gCf210WwI92NA22tLiNrqkLICXT-iycSYkZpoc7g1mNvIroX171-78V8UEJh9nwHHHa63BIXp5lUzerWh-7fQraUpn-trODJUCkXFdbU2wLm39JnLnsxKQqVYYFkOm_1zx9CZxY8GbpFBlSMsnRWw",
+            "schema": {
+              "type": "string",
+              "default": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJsYW50ZXN0ZXJAaXRlbS5jb20iLCJjbGllbnRfY2F0ZWdvcnkiOjEsImRhdGEiOnsidGVuYW50X2lkIjoiTFQiLCJ0ZW5hbnRzIjpbIkJYWFgwMDA0IiwiTFQiLCJHZW5lcmFsTG9naXN0aWNzU3lzdGVtcyJdLCJ1c2VyX2lkIjoiMTg2MjAyNjgwNjY0MDM3Nzg1NyIsInVzZXJfbmFtZSI6ImxhbnRlc3RlckBpdGVtLmNvbSIsImNvbXBhbnlfY29kZSI6IkxUIiwicm9sZV9pZHMiOlsiMTk0ODIxNzQzMDYxMzQ4NzYxOCIsIjE4NTkxMTYyODcwMDExOTA0MDMiLCIxOTg5MTU3ODc1MjI5NDM3OTU0Il19LCJpc3MiOiJodHRwczovL2lkLXN0YWdpbmcuaXRlbS5jb20iLCJjbGllbnRfaWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJhdWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJuYmYiOjE3NjU5NjAyODIsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJwaG9uZSIsIm9wZW5pZCIsImVtYWlsIiwicHJvZmlsZSJdLCJleHAiOjE3NjYwNDY2ODIsImlhdCI6MTc2NTk2MDI4MiwiY2xpZW50X25hbWUiOiJvbXMtdjIiLCJqdGkiOiIyMTUwMWIyZi1lOTRlLTRhMDgtODMxOS01OGViODY0NTEwMjEifQ.cWR4DfoLX_3boBy_NBpjLy2KDDUcazBwB_LCaxdAucMo22_s6eMP88ZAH7kuN7OTjIy_V576d_VXOuPxZvvh8JPV1vUGp8-dtvJ30ypwPGJegFEZ52MO-moRFJIwksjfe7cVe_EYthfasQgJ3pY9v2nICTx1qHbb7sR7I7pF2aBD3hdB1zF7zSgPKX9-IO5p4gCf210WwI92NA22tLiNrqkLICXT-iycSYkZpoc7g1mNvIroX171-78V8UEJh9nwHHHa63BIXp5lUzerWh-7fQraUpn-trODJUCkXFdbU2wLm39JnLnsxKQqVYYFkOm_1zx9CZxY8GbpFBlSMsnRWw"
+            }
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "LT",
+            "schema": {
+              "type": "string",
+              "default": "LT"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "header",
+            "description": "",
+            "example": "zh-CN",
+            "schema": {
+              "type": "string",
+              "default": "zh-CN"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IamTokenReqVO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespDataIamTokenRespDTO"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/iam/user-info": {
+      "get": {
+        "summary": "获取用户信息",
+        "deprecated": false,
+        "description": "根据Bearer Token获取当前用户详细信息",
+        "operationId": "getUserInfo",
+        "tags": [
+          "/iam/level2"
+        ],
+        "parameters": [
+          {
+            "name": "USER",
+            "in": "header",
+            "description": "用于获取后端拦截器当前登录的username",
+            "required": true,
+            "example": "{{username}}",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apifoxToken",
+            "in": "header",
+            "description": "apifox 云端 mock 的必要数据",
+            "required": false,
+            "example": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY2xpZW50X2NhdGVnb3J5IjoxLCJkYXRhIjp7InRlbmFudF9pZCI6IkN1YmVzaGlwIiwidGVuYW50cyI6WyJDdWJlc2hpcCIsIlNCRkgiXSwidXNlcl9pZCI6IjE4MzQ5MDQ3ODA1MDg2OTY1NzciLCJ1c2VyX25hbWUiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY29tcGFueV9jb2RlIjoiQ3ViZXNoaXAiLCJyb2xlX2lkcyI6WyIxODM0ODM4NTkwNjkyMjAwNDUwIiwiMTg3MTEyMDg3NjI3NjA1MTk2OSIsIjE4Njg1NDc3Njc3Nzk1NDkxODYiLCIxODcxMTIwODc2Mjc2MDUxOTcwIiwiMTgyNTQ1Nzg2MTk1MzE2NzM2MiIsIjE4MzQ4Mzg1OTA2OTIyMDA0NDkiXX0sImlzcyI6Imh0dHBzOi8vaWQtZGV2Lml0ZW0ucHViIiwiY2xpZW50X2lkIjoiaWFtLWludGVybmFsIiwiYXVkIjoiaWFtLWludGVybmFsIiwibmJmIjoxNzQ3MTMwNTQwLCJncmFudF90eXBlIjoicmVmcmVzaF90b2tlbiIsInNjb3BlIjpbInByb2ZpbGUiXSwiZXhwIjoxNzQ3NzM1MzQwLCJpYXQiOjE3NDcxMzA1NDAsImNsaWVudF9uYW1lIjoiaWFtIiwianRpIjoiNDk5OTg4NmItNWIwOS00YTExLTk0MDktYTQ5ZGVlMGVmODM0In0.f7mYDEGCvp7GZ5S9rZ_zT3i4D3_h2BOlEpvthGTrHbEsCm1U-yGdwwW50Md-5pEODh0vaSKO8207A2b0i5MjC-U6s2OB95qIpnzSTw_a-SIaQfy2f3zBfCfWU5a4zJ9yFOssLSM_-L3UHPNyE26ocyv2p93-zHheFlVIfJBW9WkP5mb8e5BeZmYE7NXEJTCIKmcg29eDDx98Yt_rSsK1f6ZnOoexnAhzKk-KHWN02g-UpkNtDclAo5mhFGPSi51vPLyEKk5nMWIpOY3feZCV9_xsBuQ5zilPATHEEqzLsRnhQYq9fjN4VVq3QsndPe_3-pRoP6GCggH98IkJwGC9yg",
+            "schema": {
+              "type": "string",
+              "default": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY2xpZW50X2NhdGVnb3J5IjoxLCJkYXRhIjp7InRlbmFudF9pZCI6IkN1YmVzaGlwIiwidGVuYW50cyI6WyJDdWJlc2hpcCIsIlNCRkgiXSwidXNlcl9pZCI6IjE4MzQ5MDQ3ODA1MDg2OTY1NzciLCJ1c2VyX25hbWUiOiJtZW5ndGlhbi55YW5nQGl0ZW0uY29tIiwiY29tcGFueV9jb2RlIjoiQ3ViZXNoaXAiLCJyb2xlX2lkcyI6WyIxODM0ODM4NTkwNjkyMjAwNDUwIiwiMTg3MTEyMDg3NjI3NjA1MTk2OSIsIjE4Njg1NDc3Njc3Nzk1NDkxODYiLCIxODcxMTIwODc2Mjc2MDUxOTcwIiwiMTgyNTQ1Nzg2MTk1MzE2NzM2MiIsIjE4MzQ4Mzg1OTA2OTIyMDA0NDkiXX0sImlzcyI6Imh0dHBzOi8vaWQtZGV2Lml0ZW0ucHViIiwiY2xpZW50X2lkIjoiaWFtLWludGVybmFsIiwiYXVkIjoiaWFtLWludGVybmFsIiwibmJmIjoxNzQ3MTMwNTQwLCJncmFudF90eXBlIjoicmVmcmVzaF90b2tlbiIsInNjb3BlIjpbInByb2ZpbGUiXSwiZXhwIjoxNzQ3NzM1MzQwLCJpYXQiOjE3NDcxMzA1NDAsImNsaWVudF9uYW1lIjoiaWFtIiwianRpIjoiNDk5OTg4NmItNWIwOS00YTExLTk0MDktYTQ5ZGVlMGVmODM0In0.f7mYDEGCvp7GZ5S9rZ_zT3i4D3_h2BOlEpvthGTrHbEsCm1U-yGdwwW50Md-5pEODh0vaSKO8207A2b0i5MjC-U6s2OB95qIpnzSTw_a-SIaQfy2f3zBfCfWU5a4zJ9yFOssLSM_-L3UHPNyE26ocyv2p93-zHheFlVIfJBW9WkP5mb8e5BeZmYE7NXEJTCIKmcg29eDDx98Yt_rSsK1f6ZnOoexnAhzKk-KHWN02g-UpkNtDclAo5mhFGPSi51vPLyEKk5nMWIpOY3feZCV9_xsBuQ5zilPATHEEqzLsRnhQYq9fjN4VVq3QsndPe_3-pRoP6GCggH98IkJwGC9yg"
+            }
+          },
+          {
+            "name": "trace",
+            "in": "header",
+            "description": "强制 print trace log",
+            "example": "true",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "header",
+            "description": "",
+            "example": "{{tag}}",
+            "schema": {
+              "type": "string",
+              "default": "{{tag}}"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "example": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJsYW50ZXN0ZXJAaXRlbS5jb20iLCJjbGllbnRfY2F0ZWdvcnkiOjEsImRhdGEiOnsidGVuYW50X2lkIjoiTFQiLCJ0ZW5hbnRzIjpbIkJYWFgwMDA0IiwiTFQiLCJHZW5lcmFsTG9naXN0aWNzU3lzdGVtcyJdLCJ1c2VyX2lkIjoiMTg2MjAyNjgwNjY0MDM3Nzg1NyIsInVzZXJfbmFtZSI6ImxhbnRlc3RlckBpdGVtLmNvbSIsImNvbXBhbnlfY29kZSI6IkxUIiwicm9sZV9pZHMiOlsiMTk0ODIxNzQzMDYxMzQ4NzYxOCIsIjE4NTkxMTYyODcwMDExOTA0MDMiLCIxOTg5MTU3ODc1MjI5NDM3OTU0Il19LCJpc3MiOiJodHRwczovL2lkLXN0YWdpbmcuaXRlbS5jb20iLCJjbGllbnRfaWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJhdWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJuYmYiOjE3NjU5NjAyODIsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJwaG9uZSIsIm9wZW5pZCIsImVtYWlsIiwicHJvZmlsZSJdLCJleHAiOjE3NjYwNDY2ODIsImlhdCI6MTc2NTk2MDI4MiwiY2xpZW50X25hbWUiOiJvbXMtdjIiLCJqdGkiOiIyMTUwMWIyZi1lOTRlLTRhMDgtODMxOS01OGViODY0NTEwMjEifQ.cWR4DfoLX_3boBy_NBpjLy2KDDUcazBwB_LCaxdAucMo22_s6eMP88ZAH7kuN7OTjIy_V576d_VXOuPxZvvh8JPV1vUGp8-dtvJ30ypwPGJegFEZ52MO-moRFJIwksjfe7cVe_EYthfasQgJ3pY9v2nICTx1qHbb7sR7I7pF2aBD3hdB1zF7zSgPKX9-IO5p4gCf210WwI92NA22tLiNrqkLICXT-iycSYkZpoc7g1mNvIroX171-78V8UEJh9nwHHHa63BIXp5lUzerWh-7fQraUpn-trODJUCkXFdbU2wLm39JnLnsxKQqVYYFkOm_1zx9CZxY8GbpFBlSMsnRWw",
+            "schema": {
+              "type": "string",
+              "default": "Bearer eyJraWQiOiJ1OWVkOWRmMi05OTI5LTgyYjEtYmQ5MC04OTlhMDJmMjFmbTkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJsYW50ZXN0ZXJAaXRlbS5jb20iLCJjbGllbnRfY2F0ZWdvcnkiOjEsImRhdGEiOnsidGVuYW50X2lkIjoiTFQiLCJ0ZW5hbnRzIjpbIkJYWFgwMDA0IiwiTFQiLCJHZW5lcmFsTG9naXN0aWNzU3lzdGVtcyJdLCJ1c2VyX2lkIjoiMTg2MjAyNjgwNjY0MDM3Nzg1NyIsInVzZXJfbmFtZSI6ImxhbnRlc3RlckBpdGVtLmNvbSIsImNvbXBhbnlfY29kZSI6IkxUIiwicm9sZV9pZHMiOlsiMTk0ODIxNzQzMDYxMzQ4NzYxOCIsIjE4NTkxMTYyODcwMDExOTA0MDMiLCIxOTg5MTU3ODc1MjI5NDM3OTU0Il19LCJpc3MiOiJodHRwczovL2lkLXN0YWdpbmcuaXRlbS5jb20iLCJjbGllbnRfaWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJhdWQiOiJhcHBfb21zLXYyXzE3MjEyMTk5NTk1MzIiLCJuYmYiOjE3NjU5NjAyODIsImdyYW50X3R5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJzY29wZSI6WyJwaG9uZSIsIm9wZW5pZCIsImVtYWlsIiwicHJvZmlsZSJdLCJleHAiOjE3NjYwNDY2ODIsImlhdCI6MTc2NTk2MDI4MiwiY2xpZW50X25hbWUiOiJvbXMtdjIiLCJqdGkiOiIyMTUwMWIyZi1lOTRlLTRhMDgtODMxOS01OGViODY0NTEwMjEifQ.cWR4DfoLX_3boBy_NBpjLy2KDDUcazBwB_LCaxdAucMo22_s6eMP88ZAH7kuN7OTjIy_V576d_VXOuPxZvvh8JPV1vUGp8-dtvJ30ypwPGJegFEZ52MO-moRFJIwksjfe7cVe_EYthfasQgJ3pY9v2nICTx1qHbb7sR7I7pF2aBD3hdB1zF7zSgPKX9-IO5p4gCf210WwI92NA22tLiNrqkLICXT-iycSYkZpoc7g1mNvIroX171-78V8UEJh9nwHHHa63BIXp5lUzerWh-7fQraUpn-trODJUCkXFdbU2wLm39JnLnsxKQqVYYFkOm_1zx9CZxY8GbpFBlSMsnRWw"
+            }
+          },
+          {
+            "name": "x-tenant-id",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "example": "LT",
+            "schema": {
+              "type": "string",
+              "default": "LT"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "header",
+            "description": "",
+            "example": "zh-CN",
+            "schema": {
+              "type": "string",
+              "default": "zh-CN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RespDataUserInfoRespDTO"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  }
+}

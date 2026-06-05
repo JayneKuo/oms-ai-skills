@@ -1,0 +1,29 @@
+{
+  "name": "oms-ai-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:contract": "vitest run tests/contract",
+    "auth:smoke": "node --import=tsx src/cli/auth-smoke-runner.ts",
+    "dispatch:smoke": "node --import=tsx src/cli/dispatch-smoke-runner.ts",
+    "dispatch-log:smoke": "node --import=tsx src/cli/dispatch-log-smoke-runner.ts",
+    "shipping-mapping:smoke": "node --import=tsx src/cli/shipping-mapping-smoke-runner.ts",
+    "sales-order:smoke": "node --import=tsx src/cli/sales-order-smoke-runner.ts",
+    "skill:sales-order": "node --import=tsx skills/sales-order/mcp_server.ts"
+  },
+  "imports": {
+    "#cli/auth-smoke-entrypoint": "./src/cli/auth-smoke-entrypoint.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.1.5"
+  }
+}

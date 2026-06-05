@@ -1,0 +1,24 @@
+{
+  "referenceNo": "TEST-001",
+  "orderNo": "SO-TEST-001",
+  "channelId": "SHOPIFY-US",
+  "country": "US",
+  "state": "CA",
+  "city": "Los Angeles",
+  "zipcode": "90001",
+  "address1": "123 Test Street",
+  "carrierName": "FedEx",
+  "shippingService": "Ground",
+  "items": [
+    {
+      "referenceNo": "TEST-001",
+      "orderNo": "SO-TEST-001",
+      "sku": "TEST-SKU-001",
+      "qty": 1,
+      "uom": "EA",
+      "itemDescription": "Smoke test item"
+    }
+  ],
+  "defaultRules": [],
+  "customRules": []
+}

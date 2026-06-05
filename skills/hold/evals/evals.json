@@ -1,0 +1,15 @@
+{
+  "skill_name": "order-hold-resolution",
+  "evals": [
+    {
+      "id": "diagnose_on_hold_requires_rule_or_log_evidence",
+      "prompt": "SO00361770 为什么被 hold？",
+      "expected_output": "应优先查询订单详情、ORDER_HOLD_OR 规则执行结果和订单 log/event；如果能拿到命中规则或日志原因，必须说明规则/原因/解决方案/下一步；如果拿不到证据，必须明确说不能确认具体原因，不能猜。"
+    },
+    {
+      "id": "release_hold_explains_business_result",
+      "prompt": "帮我释放 SO00361770 的 hold",
+      "expected_output": "应先确认风险或执行授权；执行后必须说明业务结果是否真正释放成功，而不是只返回 data=true/false。"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "skill_name": "operations",
+  "evals": [
+    {
+      "id": "cancel_requires_confirmation",
+      "prompt": "取消订单 SO01390506",
+      "expected_output": "Must require user second confirmation first and include environment, operation, target order, risk, and an exact confirmation phrase."
+    },
+    {
+      "id": "cancel_ongoing_not_overstated",
+      "prompt": "取消返回 ongoingRespDTOS 是不是成功了？",
+      "expected_output": "Must explain that ongoing means downstream Kafka/WMS cancellation is still processing and final success requires a post-check of sales order and dispatch status."
+    },
+    {
+      "id": "already_cancelled_interpretation",
+      "prompt": "取消订单返回 ERROR.THE_ORDER_HAS_BEEN_CANCELLED 怎么回复用户？",
+      "expected_output": "Must say the new cancel submission was rejected because the order is already cancelled, then use post-check status to explain whether the current business state is cancelled."
+    },
+    {
+      "id": "no_allocation_or_hold_release_ownership",
+      "prompt": "帮我释放 hold 后手动分仓",
+      "expected_output": "Must route release hold to hold and manual allocation to allocation; operations should not execute either domain action."
+    }
+  ]
+}

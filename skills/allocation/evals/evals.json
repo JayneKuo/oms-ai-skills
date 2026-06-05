@@ -1,0 +1,15 @@
+{
+  "skill_name": "allocation",
+  "evals": [
+    {
+      "id": "allocation_reason_requires_evidence",
+      "prompt": "这个销售订单为什么分到 Valley View？",
+      "expected_output": "必须基于分仓日志、dispatch、route 或 allocation 证据解释原因；如果证据不足，只能说明当前分仓结果，不能猜原因。"
+    },
+    {
+      "id": "manual_allocation_requires_remaining",
+      "prompt": "帮我手动分仓 SO00361770",
+      "expected_output": "必须先检查 remaining；remaining=0 时明确说明不能继续手动分仓、原因和下一步。"
+    }
+  ]
+}
