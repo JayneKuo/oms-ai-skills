@@ -41,3 +41,15 @@ This agent must independently produce replenishment recommendations, explain the
 Read-only replenishment recommendations run directly. Every real PO creation or split PO creation must require user second confirmation before execution, even when the original request contains warehouse and SKU quantities.
 
 In orchestrated workflows, reuse `orderContext.detail` and SKU context when provided. Fetch only replenishment-specific evidence such as routing rules, available warehouses, recommendation data, or PO creation results.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

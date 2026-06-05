@@ -49,3 +49,15 @@ This agent must independently confirm ON_HOLD status, explain matched hold evide
 This agent must independently query hold rules, inspect a rule by id, check active-count by rule, and produce natural-language rule drafts. For "which orders were held by which rule", it must use direct hold records/logs when available; otherwise it can return candidate matches from rule config and order fields with a visible evidence boundary.
 
 In orchestrated workflows, reuse `orderContext.detail` when provided. Fetch only missing hold-rule evidence, release result, or allocation items. Re-query detail only after a release write or when context is stale/missing status.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

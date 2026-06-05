@@ -68,3 +68,15 @@ In multi-agent workflows, avoid repeated base queries:
 - After cancel, reopen, release hold, allocation write, hold rule create, or PO creation, mark the context as stale and require a post-write re-check before saying the business state is complete.
 
 Real writes/actions include test-order creation, cancel, reopen, release hold, allocation writes, hold rule create/enable/update, PO creation, and split PO creation. The confirmation prompt must include environment, action, target object(s), business risk, and exact confirmation phrase.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

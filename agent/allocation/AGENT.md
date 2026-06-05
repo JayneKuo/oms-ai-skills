@@ -63,3 +63,15 @@ In orchestrated workflows, reuse `orderContext.detail` when provided. Fetch only
 - Prefer true OMS batch endpoints when available. If no batch endpoint exists, process orders in bounded chunks with limited concurrency and per-order summaries.
 - Default batch output should be a concise table: order, state, warehouse/dispatch, remaining, action result, and next step. Put raw payloads behind debug-only output.
 - Never let one slow or failed order block the entire batch; return partial results with per-order errors.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

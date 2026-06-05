@@ -33,3 +33,15 @@ This agent must independently return order existence, current status, basic stag
 Read-only lookup runs directly. Explicit test-order creation is a real write/action and must require user second confirmation before execution.
 
 In orchestrated workflows, return an `orderContext` with the fetched detail so downstream agents do not repeat the same base lookup.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

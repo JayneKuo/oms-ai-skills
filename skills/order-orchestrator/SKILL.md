@@ -87,6 +87,14 @@ Final answers must be business-operations friendly:
 
 Do not expose raw JSON by default. Do not turn API acceptance into business completion without post-check evidence.
 
+When composing multiple focused agents, include a compact agent trace:
+
+```text
+Handled by: [query/allocation/hold/etc.]
+Reused context: [yes/no and why]
+Additional evidence fetched: [dispatch explain / hold rules / allocation items / none]
+```
+
 ## Confirmation Policy
 
 The orchestrator must enforce this rule uniformly:

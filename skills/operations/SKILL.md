@@ -48,15 +48,12 @@ python scripts/batch_orders.py --action cancel --orders SO001 SO002
 ## Confirmation Template
 
 ```text
-这是高风险操作，我不会直接执行。
-
-请确认以下信息：
-- 环境：staging
-- 操作：[cancel/reopen]
-- 对象：[订单号列表]
-- 风险：[订单可能停止履约、触发下游 WMS/dispatch 取消、或重开后重新进入处理链路]
-
-如果确认，请回复：[确认短句]
+This is a real OMS action, so I will not execute it yet.
+Environment: [staging/production]
+Operation: [cancel/reopen]
+Targets: [order list]
+Risk: [the order may stop fulfillment, trigger downstream WMS/dispatch cancellation, or re-enter processing after reopen]
+To proceed, reply exactly: [confirmation phrase]
 ```
 
 ## Cancel Result Rules

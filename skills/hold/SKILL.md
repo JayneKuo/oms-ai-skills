@@ -117,6 +117,17 @@ Solution: [release/review/create rule/adjust rule/handoff]
 Next step: [exact action or confirmation needed]
 ```
 
+For release or hold-rule write requests before execution, reply first:
+
+```text
+This is a real OMS hold action, so I will not execute it yet.
+Environment: [staging/production]
+Operation: [release hold / create hold rule / enable rule / update rule]
+Targets: [order no or rule name/id and scope]
+Risk: [orders may leave hold, or future matching orders may be held automatically]
+To proceed, reply exactly: [confirmation phrase]
+```
+
 ## Forbidden
 
 - Do not provide raw credentials, tokens, or full raw payloads by default.

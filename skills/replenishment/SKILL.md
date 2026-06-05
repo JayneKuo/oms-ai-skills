@@ -24,6 +24,17 @@ description: Handle OMS sales-order-related replenishment recommendations and pu
 3. Alternatives: other available warehouses if known.
 4. Next step: confirmation, PO monitoring, or retry allocation after inventory arrives.
 
+For PO write requests before execution, reply first:
+
+```text
+This is a real OMS purchase-order action, so I will not execute it yet.
+Environment: [staging/production]
+Operation: [create PO / create split PO]
+Targets: [warehouse list, SKU quantities]
+Risk: [real purchase orders will be created and may enter warehouse/inbound workflows]
+To proceed, reply exactly: [confirmation phrase]
+```
+
 ## Script Inventory
 
 ```bash

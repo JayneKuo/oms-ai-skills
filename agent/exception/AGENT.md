@@ -33,3 +33,15 @@ Own scripts:
 This agent must independently list EXCEPTION orders, verify current detail status, separate stale list rows from current truth, and return cause/solution/next step. Use `diagnose_exception.py` for single-order and batch diagnosis summaries. It must hand off writes to `operations`.
 
 In orchestrated workflows, reuse `orderContext.detail` when provided. Do not repeat detail lookup unless the context is missing current status/evidence or a prior write made the context stale.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

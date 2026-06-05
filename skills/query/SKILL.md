@@ -44,6 +44,17 @@ Confirmed facts: [orderNo, status, channel order no, dispatch count if visible]
 Next step: [no action, or route to focused skill]
 ```
 
+For test-order creation requests, do not submit immediately. Reply first:
+
+```text
+This is a real OMS action, so I will not create the test order yet.
+Environment: [staging/production]
+Operation: create test sales order
+Targets: [channel order no, SKU, quantity, ship-to summary]
+Risk: [a real order will be created in OMS and may enter allocation/warehouse workflows]
+To proceed, reply exactly: [confirmation phrase]
+```
+
 ## Handoff Rules
 
 - `ON_HOLD` -> `hold`.

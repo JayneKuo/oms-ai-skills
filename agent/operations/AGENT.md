@@ -38,3 +38,15 @@ Own scripts:
 This agent must independently execute only confirmed high-impact writes, translate OMS acceptance/rejection/ongoing states, and require follow-up checks before reporting async work as complete.
 
 In orchestrated workflows, reuse `orderContext.detail` for pre-write risk/eligibility messaging. Do not repeat base detail lookup before the write unless required fields are missing. Always re-query or request a post-check after a write before claiming final business completion.
+
+## Launch Output Standard
+
+Follow `docs/oms-agent-skill-launch-runbook.md` for production routing, shared context reuse, second-confirmation prompts, and regression prompts.
+
+Default user-facing output:
+
+1. Result: business result in one sentence.
+2. Evidence: confirmed facts and sources, not raw JSON by default.
+3. Explanation: why it happened, or what remains unconfirmed.
+4. Actionability: what can or cannot be done now.
+5. Next step: no action, focused handoff, or user second-confirmation request.

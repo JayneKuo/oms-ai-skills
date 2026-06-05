@@ -17,6 +17,8 @@ Each focused agent must be able to complete its own business loop without callin
 
 Every functional agent owns a minimum base-query capability: `get_order_detail.py`. This does not make every agent a general query agent; it lets each agent independently verify the latest order status before diagnosing, acting, or handing off. `query` remains the dedicated list/detail/status agent.
 
+For launch execution details, see `docs/oms-agent-skill-launch-runbook.md`. That runbook is the source for default routing, standard output templates, second-confirmation prompts, and regression prompts.
+
 ## Shared Context And De-Duplication
 
 Standalone mode and orchestrated mode are different:

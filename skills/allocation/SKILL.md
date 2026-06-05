@@ -1,6 +1,7 @@
 ﻿---
 name: allocation
-description: 璇婃柇 OMS 閿€鍞鍗曞垎浠撱€佷粨搴撳垎閰嶃€乺emaining 鏁伴噺鍜屾墜鍔ㄥ垎浠撳彲琛屾€с€傜敤鎴烽棶鍒嗗埌鍝釜浠撱€佷负浠€涔堝垎鍒拌繖涓粨銆佽繕鑳戒笉鑳芥墜鍔ㄥ垎浠撴椂浣跨敤銆?---
+description: Diagnose OMS sales-order warehouse allocation, dispatch assignment, remaining quantity, manual/auto allocation eligibility, and allocation explanations. Use when the user asks which warehouse an order went to, why it went there, or whether allocation can be performed.
+---
 
 # Allocation Skill
 
@@ -70,6 +71,17 @@ For blocked allocation writes where the order is already allocated:
 4. Reason/evidence: allocation items, order dispatch, and dispatch explain log when available.
 5. Next step: check WMS/downstream progress or choose a different eligible order if the user wants to test manual allocation.
 
+For allocation write requests before execution, reply first:
+
+```text
+This is a real OMS allocation action, so I will not execute it yet.
+Environment: [staging/production]
+Operation: [manual whole-order / manual SKU / auto whole-order / auto SKU / force / batch allocation]
+Targets: [order list, warehouse if specified, SKU quantities if specified]
+Risk: [OMS may create or change dispatch allocation and downstream warehouse processing may start]
+To proceed, reply exactly: [confirmation phrase]
+```
+
 ## Warehouse Assignment Explanation Contract
 
 When the user asks why an order was assigned to a warehouse, the answer must include these parts:
@@ -99,7 +111,7 @@ python scripts/explain_warehouse_assignment.py --order SO00361770
 python scripts/explain_warehouse_assignment.py --order SO00361770 --compare-warehouse "Valley View"
 ```
 
-## 鑴氭湰
+## Script Inventory
 
 ```bash
 python scripts/check_manual_allocation.py --order SO00361770
