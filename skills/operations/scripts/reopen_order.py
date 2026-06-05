@@ -2,7 +2,7 @@
 Reopen a sales order that is currently in EXCEPTION.
 
 Usage:
-  python reopen_order.py --order SO00361770
+  python reopen_order.py --order SO00361770 --confirm-reopen
 """
 import argparse
 import json
@@ -27,8 +27,27 @@ def main():
     parser = argparse.ArgumentParser()
     oms_client.add_config_arg(parser)
     parser.add_argument("--order", required=True, help="Sales order number")
+    parser.add_argument("--confirm-reopen", action="store_true", help="Required to submit a real reopen request to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
+
+    if not args.confirm_reopen:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-reopen",
+                "operation": "reopen_sales_order",
+                "orderNo": args.order,
+            },
+            "businessSummary": {
+                "orderNo": args.order,
+                "state": "not_submitted",
+                "message": "This is a real OMS reopen action. Re-run with --confirm-reopen only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     result = oms_client.post(f"/api/linker-oms/opc/app-api/sale-order/reopen/{args.order}")
     result["_env"] = oms_client.get_env_label()

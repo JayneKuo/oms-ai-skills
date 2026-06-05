@@ -9,7 +9,7 @@ Examples:
   python batch_allocation.py --action explain --orders SO001 SO002
   python batch_allocation.py --action items --orders SO001 SO002
   python batch_allocation.py --action check --orders SO001 SO002
-  python batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH
+  python batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
 """
 import argparse
 import concurrent.futures
@@ -230,12 +230,34 @@ def main():
     parser.add_argument("--uom", default="EA")
     parser.add_argument("--remark", default=None)
     parser.add_argument("--force-submit", action="store_true")
+    parser.add_argument("--confirm-allocation", action="store_true", help="Required to submit real batch allocation requests to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
     orders = parse_orders(args)
     if not orders:
         parser.error("--orders or --orders-file is required")
+    if args.action == "manual_allocate" and not args.confirm_allocation:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "action": args.action,
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-allocation",
+                "operation": "batch_allocation",
+                "orders": orders,
+                "dispatchType": args.dispatch_type,
+                "warehouse": args.warehouse,
+                "sku": args.sku,
+                "qty": args.qty,
+            },
+            "businessSummary": {
+                "state": "not_submitted",
+                "message": "This is a real OMS batch allocation action. Re-run with --confirm-allocation only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     worker_count = max(1, min(args.max_workers, 8, len(orders)))
     started = time.perf_counter()

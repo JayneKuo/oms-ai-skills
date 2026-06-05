@@ -3,7 +3,7 @@ Create a test sales order, then return the OMS response.
 
 Usage:
   python create_order.py --channel-order-no CSO-12345 --sku BATESTSKU-1 --qty 1 \
-    --ship-name "Test User" --address1 "123 Main St" --city "Los Angeles" --state CA --zip-code 90001
+    --ship-name "Test User" --address1 "123 Main St" --city "Los Angeles" --state CA --zip-code 90001 --confirm-create
 """
 import argparse
 import json
@@ -84,6 +84,7 @@ def main():
     parser.add_argument("--bill-to", default=None, help="Billing address JSON; defaults to ship-to")
     parser.add_argument("--reference-no", default=None, help="External reference number")
     parser.add_argument("--remark", default=None, help="Remark")
+    parser.add_argument("--confirm-create", action="store_true", help="Required to submit a real sales-order creation request to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
@@ -129,6 +130,24 @@ def main():
     }
     if args.remark:
         body["remark"] = args.remark
+
+    if not args.confirm_create:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-create",
+                "operation": "create_test_sales_order",
+                "channelSalesOrderNo": args.channel_order_no,
+                "items": raw_items,
+            },
+            "businessSummary": {
+                "state": "not_submitted",
+                "message": "This is a real OMS action. Re-run with --confirm-create only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     result = oms_client.post("/api/linker-oms/opc/app-api/sale-order", body)
     result["_env"] = oms_client.get_env_label()

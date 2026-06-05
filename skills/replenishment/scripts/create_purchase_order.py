@@ -2,8 +2,8 @@
 Create a single replenishment purchase order.
 
 Usage:
-  python create_purchase_order.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 1
-  python create_purchase_order.py --warehouse "Valley View" --skus '[{"sku":"BATESTSKU-1","quantity":1}]'
+  python create_purchase_order.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 1 --confirm-create
+  python create_purchase_order.py --warehouse "Valley View" --skus '[{"sku":"BATESTSKU-1","quantity":1}]' --confirm-create
 """
 import argparse
 import json
@@ -59,6 +59,7 @@ def main():
     parser.add_argument("--channel-name", default="Walmart-test11")
     parser.add_argument("--data-channel", default="Walmart")
     parser.add_argument("--accounting-code", default="889")
+    parser.add_argument("--confirm-create", action="store_true", help="Required to submit a real purchase-order creation request to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
@@ -81,6 +82,24 @@ def main():
             for index, item in enumerate(items)
         ],
     }
+
+    if not args.confirm_create:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-create",
+                "operation": "create_purchase_order",
+                "warehouse": args.warehouse,
+                "items": items,
+            },
+            "businessSummary": {
+                "state": "not_submitted",
+                "message": "This is a real OMS purchase-order action. Re-run with --confirm-create only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     result = oms_client.post("/api/linker-oms/opc/app-api/purchase-order", body)
     result["_env"] = oms_client.get_env_label()

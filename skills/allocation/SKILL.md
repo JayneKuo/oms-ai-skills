@@ -31,10 +31,10 @@ After any successful manual/auto dispatch submission, the agent must re-read the
 Examples:
 
 ```bash
-python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_AUTO_DISPATCH
-python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_DISPATCH --warehouse "Valley View" --accounting-code 889
-python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_SKU_AUTO_DISPATCH --sku SKU-A --qty 2
-python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_SKU_DISPATCH --warehouse "Valley View" --sku SKU-A --qty 2
+python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
+python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_DISPATCH --warehouse "Valley View" --accounting-code 889 --confirm-allocation
+python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_SKU_AUTO_DISPATCH --sku SKU-A --qty 2 --confirm-allocation
+python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_SKU_DISPATCH --warehouse "Valley View" --sku SKU-A --qty 2 --confirm-allocation
 ```
 ## Runtime Guardrails
 
@@ -119,11 +119,11 @@ python scripts/get_allocation_items.py --order SO00361770
 python scripts/get_order_detail.py --order SO00361770
 python scripts/get_routing_rules.py
 python scripts/explain_warehouse_assignment.py --order SO00361770
-python scripts/manual_allocate.py --order SO00361770 --warehouse WH-001 --skus '[{"sku":"SKU-A","qty":2}]'
+python scripts/manual_allocate.py --order SO00361770 --warehouse WH-001 --skus '[{"sku":"SKU-A","qty":2}]' --confirm-allocation
 python scripts/batch_allocation.py --action explain --orders SO001 SO002
 python scripts/batch_allocation.py --action items --orders SO001 SO002
 python scripts/batch_allocation.py --action check --orders SO001 SO002
-python scripts/batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH
+python scripts/batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
 ```
 
 ## Batch Execution Contract

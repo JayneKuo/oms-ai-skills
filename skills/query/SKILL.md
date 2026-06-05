@@ -21,7 +21,7 @@ description: Lightweight OMS sales-order lookup: list search, exact order detail
 python scripts/query_orders.py --status EXCEPTION --size 20
 python scripts/query_orders.py --keyword SO00361770
 python scripts/get_order_detail.py --order SO00361770
-python scripts/create_order.py --channel-order-no AI-ORDER-123 --sku BATESTSKU-1 --qty 1 --ship-name "Test User" --address1 "123 Main St" --city "Los Angeles" --state CA --zip-code 90001
+python scripts/create_order.py --channel-order-no AI-ORDER-123 --sku BATESTSKU-1 --qty 1 --ship-name "Test User" --address1 "123 Main St" --city "Los Angeles" --state CA --zip-code 90001 --confirm-create
 ```
 
 ## Status Translation

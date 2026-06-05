@@ -26,7 +26,7 @@ Default script:
 
 ```bash
 python scripts/diagnose_hold.py --order SO00361770
-python scripts/diagnose_hold.py --order SO00361770 --release
+python scripts/diagnose_hold.py --order SO00361770 --release --confirm-release
 python scripts/diagnose_hold.py --orders SO001 SO002
 ```
 
@@ -96,7 +96,7 @@ Behavior:
 ```bash
 python scripts/get_order_detail.py --order SO00361770
 python scripts/get_hold_reason.py --order SO00361770
-python scripts/release_hold.py --order SO00361770
+python scripts/release_hold.py --order SO00361770 --confirm-release
 python scripts/get_allocation_items.py --order SO00361770
 python scripts/diagnose_hold.py --order SO00361770
 python scripts/hold_rules.py --action list

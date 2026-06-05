@@ -6,8 +6,8 @@ the cancellation request has been accepted and downstream processing such as
 Kafka/WMS cancellation is still in progress; it is not a completed cancellation.
 
 Usage:
-  python cancel_order.py --orders SO001
-  python cancel_order.py --orders SO001 SO002 SO003
+  python cancel_order.py --orders SO001 --confirm-cancel
+  python cancel_order.py --orders SO001 SO002 SO003 --confirm-cancel
 """
 import argparse
 import json
@@ -107,6 +107,7 @@ def main():
     parser.add_argument("--orders", nargs="+", required=True, help="One or more order numbers")
     parser.add_argument("--post-check-delay", type=float, default=1.0, help="Seconds to wait before post-cancel detail check")
     parser.add_argument("--skip-post-check", action="store_true")
+    parser.add_argument("--confirm-cancel", action="store_true", help="Required to submit a real cancel request to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
@@ -114,6 +115,23 @@ def main():
         "merchantNo": oms_client._env("OMS_MERCHANT_NO"),
         "orderNos": args.orders
     }
+
+    if not args.confirm_cancel:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-cancel",
+                "operation": "cancel_sales_order",
+                "orders": args.orders,
+            },
+            "businessSummary": {
+                "state": "not_submitted",
+                "message": "This is a real OMS cancel action. Re-run with --confirm-cancel only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     result = oms_client.post("/api/linker-oms/opc/app-api/sale-order/cancel", body)
     result["_env"] = oms_client.get_env_label()

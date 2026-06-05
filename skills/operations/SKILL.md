@@ -38,11 +38,11 @@ After execution:
 
 ```bash
 python scripts/get_order_detail.py --order SO00361770
-python scripts/reopen_order.py --order SO00361770
-python scripts/cancel_order.py --orders SO00361770
-python scripts/cancel_order.py --orders SO001 SO002 --post-check-delay 3
-python scripts/batch_orders.py --action reopen --orders SO001 SO002
-python scripts/batch_orders.py --action cancel --orders SO001 SO002
+python scripts/reopen_order.py --order SO00361770 --confirm-reopen
+python scripts/cancel_order.py --orders SO00361770 --confirm-cancel
+python scripts/cancel_order.py --orders SO001 SO002 --post-check-delay 3 --confirm-cancel
+python scripts/batch_orders.py --action reopen --orders SO001 SO002 --confirm-execute
+python scripts/batch_orders.py --action cancel --orders SO001 SO002 --confirm-execute
 ```
 
 ## Confirmation Template

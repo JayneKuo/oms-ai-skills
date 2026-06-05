@@ -4,8 +4,8 @@ Batch high-impact sales order operations.
 Operations owns cancel and reopen. Release hold belongs to the hold skill.
 
 Usage:
-  python batch_orders.py --action reopen --orders SO001 SO002 SO003
-  python batch_orders.py --action cancel --orders SO001 SO002
+  python batch_orders.py --action reopen --orders SO001 SO002 SO003 --confirm-execute
+  python batch_orders.py --action cancel --orders SO001 SO002 --confirm-execute
 """
 import argparse
 import concurrent.futures
@@ -80,8 +80,26 @@ def main():
     parser.add_argument("--orders", nargs="+", required=True, help="One or more order numbers")
     parser.add_argument("--max-workers", type=int, default=4)
     parser.add_argument("--post-check-delay", type=float, default=1.0)
+    parser.add_argument("--confirm-execute", action="store_true", help="Required to submit real batch cancel/reopen requests to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
+
+    if not args.confirm_execute:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-execute",
+                "operation": f"batch_{args.action}",
+                "orders": args.orders,
+            },
+            "businessSummary": {
+                "state": "not_submitted",
+                "message": "This is a real OMS batch order action. Re-run with --confirm-execute only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     if args.action == "cancel":
         batch_result = cancel_many(args.orders, args.post_check_delay)

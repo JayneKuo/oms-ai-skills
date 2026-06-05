@@ -42,9 +42,9 @@ python scripts/get_order_detail.py --order SO00361770
 python scripts/suggest_purchase_order.py --sku BATESTSKU-1 --quantity 10
 python scripts/suggest_purchase_order.py --skus '[{"sku":"BATESTSKU-1","quantity":10}]'
 python scripts/suggest_purchase_order.py --sku BATESTSKU-1 --quantity 10 --warehouse "Valley View"
-python scripts/create_purchase_order.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 10
-python scripts/create_purchase_order_split.py --orders '[{"warehouse":"Valley View","skus":[{"sku":"BATESTSKU-1","quantity":5}]}]'
-python scripts/create_purchase_order_split.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 5
+python scripts/create_purchase_order.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 10 --confirm-create
+python scripts/create_purchase_order_split.py --orders '[{"warehouse":"Valley View","skus":[{"sku":"BATESTSKU-1","quantity":5}]}]' --confirm-create
+python scripts/create_purchase_order_split.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 5 --confirm-create
 python scripts/get_routing_rules.py
 ```
 

@@ -2,8 +2,8 @@
 Create split replenishment purchase orders.
 
 Usage:
-  python create_purchase_order_split.py --orders '[{"warehouse":"Main Warehouse","skus":[{"sku":"BATESTSKU-1","quantity":1}]}]'
-  python create_purchase_order_split.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 1
+  python create_purchase_order_split.py --orders '[{"warehouse":"Main Warehouse","skus":[{"sku":"BATESTSKU-1","quantity":1}]}]' --confirm-create
+  python create_purchase_order_split.py --warehouse "Valley View" --sku BATESTSKU-1 --quantity 1 --confirm-create
 """
 import argparse
 import json
@@ -65,12 +65,30 @@ def main():
     parser.add_argument("--channel-name", default="Walmart-test11")
     parser.add_argument("--data-channel", default="Walmart")
     parser.add_argument("--accounting-code", default="889")
+    parser.add_argument("--confirm-create", action="store_true", help="Required to submit real split purchase-order creation requests to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
     warehouse_orders = parse_warehouse_orders(args, parser)
     validate_warehouse_orders(warehouse_orders, parser)
     merchant_no = oms_client._env("OMS_MERCHANT_NO")
+
+    if not args.confirm_create:
+        print(json.dumps({
+            "code": "CONFIRMATION_REQUIRED",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-create",
+                "operation": "create_split_purchase_orders",
+                "warehouseOrders": warehouse_orders,
+            },
+            "businessSummary": {
+                "state": "not_submitted",
+                "message": "This is a real OMS split purchase-order action. Re-run with --confirm-create only after user second confirmation.",
+            },
+        }, indent=2, ensure_ascii=False))
+        return
 
     results = []
     for idx, order in enumerate(warehouse_orders):

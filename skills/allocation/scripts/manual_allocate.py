@@ -8,11 +8,11 @@ Supported dispatch types:
   HAND_SKU_AUTO_DISPATCH    Let OMS auto-dispatch specific SKU quantities.
 
 Usage:
-  python manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_AUTO_DISPATCH
-  python manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_DISPATCH --warehouse "Valley View" --accounting-code 889
-  python manual_allocate.py --order SO001 --dispatch-type HAND_SKU_AUTO_DISPATCH --sku SKU-A --qty 2
-  python manual_allocate.py --order SO001 --dispatch-type HAND_SKU_DISPATCH --warehouse "Valley View" --sku SKU-A --qty 2
-  python manual_allocate.py --order SO001 --warehouse-orders '[{"warehouseName":"Valley View","accountingCode":"889","items":[{"sku":"SKU-A","qty":2}]}]'
+  python manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
+  python manual_allocate.py --order SO001 --dispatch-type HAND_WHOLE_DISPATCH --warehouse "Valley View" --accounting-code 889 --confirm-allocation
+  python manual_allocate.py --order SO001 --dispatch-type HAND_SKU_AUTO_DISPATCH --sku SKU-A --qty 2 --confirm-allocation
+  python manual_allocate.py --order SO001 --dispatch-type HAND_SKU_DISPATCH --warehouse "Valley View" --sku SKU-A --qty 2 --confirm-allocation
+  python manual_allocate.py --order SO001 --warehouse-orders '[{"warehouseName":"Valley View","accountingCode":"889","items":[{"sku":"SKU-A","qty":2}]}]' --confirm-allocation
 """
 import argparse
 import json
@@ -252,12 +252,36 @@ def main():
         action="store_true",
         help="Submit even if precheck says the order has no remaining quantity or is not eligible.",
     )
+    parser.add_argument("--confirm-allocation", action="store_true", help="Required to submit a real allocation request to OMS.")
     args = parser.parse_args()
     oms_client.load_config_arg(args)
 
     body = build_body(args, parser)
     precheck = build_allocation_context(args.order, include_eligibility=True)
     blocked, block_reason = should_block_before_submit(precheck)
+    if not args.confirm_allocation:
+        result = {
+            "code": "CONFIRMATION_REQUIRED",
+            "data": None,
+            "msg": "confirmation_required",
+            "_env": oms_client.get_env_label(),
+            "_request": {
+                "orderNo": body.get("orderNo"),
+                "dispatchType": body.get("dispatchType"),
+                "hasWarehouseDTOList": bool(body.get("warehouseDTOList")),
+                "hasItemDTOList": bool(body.get("itemDTOList")),
+                "submittedToOms": False,
+                "requiredConfirmationFlag": "--confirm-allocation",
+            },
+            "preAllocationCheck": precheck,
+            "businessSummary": {
+                "state": "not_submitted",
+                "reason": "confirmation_required",
+                "message": "This is a real OMS allocation action. Re-run with --confirm-allocation only after user second confirmation.",
+            },
+        }
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return
     if blocked and not args.force_submit:
         result = {
             "code": "PRECHECK_BLOCKED",

@@ -4,7 +4,7 @@ Diagnose ON_HOLD orders and optionally release hold with post-check.
 Examples:
   python diagnose_hold.py --order SO01376525
   python diagnose_hold.py --orders SO01376525 SO01376524
-  python diagnose_hold.py --order SO01376525 --release
+  python diagnose_hold.py --order SO01376525 --release --confirm-release
 """
 import argparse
 import concurrent.futures
@@ -218,7 +218,7 @@ def build_user_summary(result):
     return "\n".join(lines)
 
 
-def diagnose_one(order_no, do_release=False):
+def diagnose_one(order_no, do_release=False, confirm_release=False):
     started = time.perf_counter()
     order_response = safe_get(f"/api/linker-oms/opc/app-api/sale-order/{order_no}")
     order_data = unwrap_data(order_response) or {}
@@ -251,6 +251,17 @@ def diagnose_one(order_no, do_release=False):
             "businessResult": "not_submitted",
             "submittedToOms": False,
             "reason": "latest_status_is_not_on_hold",
+            "postCheck": {
+                "status": status,
+                "statusName": order_data.get("statusName"),
+            },
+        }
+    elif do_release and not confirm_release:
+        result["releaseResult"] = {
+            "businessResult": "confirmation_required",
+            "submittedToOms": False,
+            "reason": "user_second_confirmation_required",
+            "requiredConfirmationFlag": "--confirm-release",
             "postCheck": {
                 "status": status,
                 "statusName": order_data.get("statusName"),
@@ -311,6 +322,7 @@ def main():
     parser.add_argument("--order", default=None)
     parser.add_argument("--orders", nargs="*", default=[])
     parser.add_argument("--release", action="store_true")
+    parser.add_argument("--confirm-release", action="store_true")
     parser.add_argument("--max-workers", type=int, default=4)
     args = parser.parse_args()
     oms_client.load_config_arg(args)
@@ -322,7 +334,7 @@ def main():
     started = time.perf_counter()
     workers = max(1, min(args.max_workers, 8, len(orders)))
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = [executor.submit(diagnose_one, order_no, args.release) for order_no in orders]
+        futures = [executor.submit(diagnose_one, order_no, args.release, args.confirm_release) for order_no in orders]
         results = [future.result() for future in concurrent.futures.as_completed(futures)]
     results.sort(key=lambda row: orders.index(row["orderNo"]) if row.get("orderNo") in orders else len(orders))
 
