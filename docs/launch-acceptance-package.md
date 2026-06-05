@@ -34,15 +34,15 @@ Production write policy: read-only actions may run directly; dry-run/draft actio
 | `query` | List/detail/status, exact detail fallback, business summary, explicit test-order creation | Test order creation after second confirmation | Ready |
 | `exception` | EXCEPTION diagnosis, stale-status detection, out-of-stock routing, batch diagnosis | None | Ready |
 | `hold` | ON_HOLD diagnosis, release hold, hold rule list/get/active-count, rule-to-order candidate mapping, natural-language rule draft/create | Release hold and hold rule create after second confirmation | Ready with caveats |
-| `allocation` | Allocation result/reason, dispatch explain, remaining qty, manual allocation eligibility, batch allocation, allocation writes | Manual/auto/batch allocation after second confirmation and precheck | Ready |
-| `operations` | Cancel, batch cancel, downstream/WMS cancel post-check, rejection interpretation | Cancel after second confirmation | Ready |
+| `allocation` | Allocation result/reason, dispatch/DN/WMS/fulfillment state, dispatch explain, remaining qty, manual allocation eligibility, dispatch release/retry, batch allocation, allocation writes | Manual/auto/batch allocation after second confirmation and precheck | Ready |
+| `operations` | Cancel, batch cancel, cancel-specific downstream/WMS post-check, rejection interpretation | Cancel after second confirmation | Ready |
 | `replenishment` | Replenishment recommendation, warehouse evidence, single/split PO creation | PO creation after second confirmation | Ready with caveats |
 | `order-orchestrator` | Intent routing, shared `orderContext` reuse, multi-step composition | No direct writes | Ready |
 
 ## Ownership Rules To Enforce At Runtime
 
 - `release hold` belongs to `hold`, not `operations`.
-- `manual/auto/force/batch allocation` belongs to `allocation`, not `operations`.
+- `manual/auto/force/batch allocation`, dispatch release/retry, and general dispatch/fulfillment diagnosis belong to `allocation`, not `operations`.
 - `cancel` belongs to `operations`; `reopen-for-allocation retry` belongs to `allocation`.
 - `hold rule query/create` belongs to `hold`.
 - `PO/replenishment` belongs to `replenishment`.
@@ -69,6 +69,7 @@ Confirmation prompts must include environment, action, target object(s), busines
 
 - Hold rule exact causality is not always provable from exposed staging APIs. Current implementation can show candidate/historical rule matches from rule config and order fields, but must not claim exact causality without hold execution logs, order event logs, or hold records.
 - Replenishment warehouse recommendation may only have warehouse ID evidence. If display name is missing, the user must confirm the target warehouse display name before PO creation.
+- Dispatch/DN/WMS/warehouse-processing visibility is allocation-domain evidence after allocation; operations only uses dispatch state to prove cancel completion.
 - Cancel may return `ongoingRespDTOS`; this means downstream/WMS cancellation is in progress. Completion requires post-check of sales order and dispatch records.
 - `DISPATCHED` purchase order status means the PO entered warehouse flow; it does not prove inventory has been received.
 - Routing rule configuration is context, not proof of sales-order allocation. Allocation reason must come from dispatch explain logs or equivalent execution trace.

@@ -20,6 +20,7 @@ Scope: `skills/allocation` only. Legacy `skills/sales-order` is excluded from op
 | Script | Scenario | Result |
 | --- | --- | --- |
 | `get_order_detail.py` | Basic standalone order lookup | Passed; returned order, item, dispatch, WMS status, and assigned warehouse. |
+| `get_dispatch_fulfillment.py` | Dispatch/DN/WMS/warehouse-processing status lookup | Added as allocation-owned read path; returns dispatch number, DN/behind order number, warehouse, status, remaining qty, and next step. |
 | `get_allocation_items.py` | Remaining quantity lookup | Passed; returned total qty `2`, allocated `2`, remaining `0`. |
 | `check_manual_allocation.py` | Manual allocation eligibility | Passed; OMS rejected with `ERROR.THE_STATUS_NOT_SUPPORT_ALLOCATED`, which is correct for this warehouse-processing order. |
 | `manual_allocate.py` | Already allocated `HAND_SKU_AUTO_DISPATCH` boundary | Passed after fix; precheck returned `PRECHECK_BLOCKED`, `_request.submittedToOms=false`, existing allocation details, and no allocatable products. |
@@ -64,8 +65,9 @@ Ontario 没有进入本次可用仓候选列表，所以不能作为本次自动
 - `manual_allocate.py` now re-reads order state after any accepted allocation write through `postAllocationCheck`.
 - Rejected manual allocation now returns `businessSummary.state = rejected` so the agent will not claim allocation success.
 - Already allocated orders now block before submitting manual/auto allocation. The response explains current warehouse, dispatch, SKU quantities, `remaining=0`, and that no allocatable products remain.
-- Batch allocation workflows now live in allocation, not operations, with `batch_allocation.py` for explain/items/check/manual allocation.
+- Batch allocation and fulfillment workflows now live in allocation, not operations, with `batch_allocation.py` for explain/items/check/fulfillment/manual allocation.
 - `SKILL.md` now requires post-write re-read and dispatch explain evidence in user-facing replies.
+- `get_dispatch_fulfillment.py` was added so normal dispatch, DN, WMS handoff, and warehouse-processing questions stay inside allocation instead of operations.
 
 ## Ability Boundary
 
@@ -75,10 +77,11 @@ Allocation can independently complete:
 - Remaining quantity check.
 - Manual-allocation eligibility check.
 - Auto allocation reason explanation from dispatch explain logs.
+- Dispatch/DN/WMS/warehouse-processing state explanation after allocation.
 - Candidate warehouse explanation when candidate evidence exists.
 - Manual allocation submission after user second confirmation, with post-write re-read if OMS accepts.
 - Already allocated / no-remaining-product handling without submitting a needless write.
-- Batch explain/items/check/manual allocation with bounded concurrency, partial results, and per-order summaries.
+- Batch explain/items/check/fulfillment/manual allocation with bounded concurrency, partial results, and per-order summaries.
 
 Allocation must not:
 

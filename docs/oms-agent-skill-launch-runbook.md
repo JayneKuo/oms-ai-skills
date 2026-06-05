@@ -33,8 +33,8 @@ The confirmation prompt must include:
 | "Find this order", "what status is it", "does it exist" | `query` | Fast base lookup and status translation. | Deep root-cause diagnosis or writes. |
 | "Why is this order in EXCEPTION", "how do I fix this exception" | `exception` | Owns exception cause, solution, and next action. | Reopen/cancel/create PO directly. |
 | "Why is this ON_HOLD", "which hold rule", "show hold rules", "create hold rule" | `hold` | Owns hold evidence, rule lookup, rule-to-order mapping, release assessment, and rule drafts. | Allocation or operations writes. |
-| "Where was it allocated", "why this warehouse", "can I allocate", "auto/manual allocate", "reopen this exception order to retry allocation" | `allocation` | Owns allocation result, dispatch explain logs, remaining quantity, reopen-for-allocation retry, and allocation writes. | Cancel or PO creation. |
-| "Cancel this order", "batch cancel" | `operations` | Owns high-impact non-allocation cancel writes and downstream state interpretation. | Hold release, allocation, replenishment, reopen. |
+| "Where was it allocated", "why this warehouse", "what is the dispatch/DN/WMS state", "why warehouse processing", "can I allocate", "auto/manual allocate", "reopen this exception order to retry allocation" | `allocation` | Owns allocation result, dispatch/fulfillment visibility, dispatch explain logs, remaining quantity, dispatch release/retry, reopen-for-allocation retry, and allocation writes. | Cancel or PO creation. |
+| "Cancel this order", "batch cancel" | `operations` | Owns high-impact non-allocation cancel writes and cancel-specific downstream post-check interpretation. | General dispatch/fulfillment diagnosis, hold release, allocation, replenishment, reopen. |
 | "Do we need replenishment", "which purchase warehouse", "create PO/split PO" | `replenishment` | Owns replenishment recommendation and PO creation. | Explain sales-order allocation reason. |
 | Multi-step order request | `order-orchestrator` | Routes in business-process order and passes shared context. | Direct OMS API calls. |
 
@@ -45,7 +45,7 @@ When the user gives a broad or multi-step request, follow this order:
 1. `query`: establish current order status and reusable `orderContext`.
 2. `hold`: if status is `ON_HOLD` or the user asks about hold/rules.
 3. `exception`: if status is `EXCEPTION` or the user asks about exception cause.
-4. `allocation`: if warehouse, dispatch, remaining quantity, or allocation eligibility is involved.
+4. `allocation`: if warehouse, dispatch, DN, WMS/fulfillment state, remaining quantity, allocation retry/release, or allocation eligibility is involved.
 5. `replenishment`: if shortage/SKU quantity/PO is involved.
 6. `operations`: only for confirmed cancel workflow.
 
@@ -132,8 +132,8 @@ Next step: [monitor/retry/handoff/no action]
 | `query` | Order status, plain-language meaning, confirmed identifiers, next focused agent. | Do not diagnose root cause from status alone. |
 | `exception` | Cause, affected SKU/quantity when known, recommended resolution, reopen timing. | Do not invent shortage/routing causes without detail/log evidence. |
 | `hold` | Current hold state, direct rule/log proof or candidate rule boundary, release/create-rule next step. | Candidate matching is not direct causality. |
-| `allocation` | Assigned warehouse, dispatch number/status, SKU quantities, remaining quantity, dispatch explain reason when available. | Final warehouse proves result, not reason. |
-| `operations` | Pre-check risk, second confirmation request, submission result, post-check state, downstream/WMS boundary. | API acceptance is not business completion. |
+| `allocation` | Assigned warehouse, dispatch number/status, DN/behind order number, WMS/warehouse handoff state, SKU quantities, remaining quantity, dispatch explain reason when available. | Final warehouse proves result, not reason; order detail can prove status but not why a warehouse was selected. |
+| `operations` | Cancel pre-check risk, second confirmation request, submission result, cancel post-check state, cancel-specific downstream/WMS boundary. | API acceptance is not business completion; it does not own general fulfillment diagnosis. |
 | `replenishment` | Recommended warehouse, SKU/quantity, reason, alternatives, PO status after creation. | PO `DISPATCHED` does not mean inventory is received. |
 | `order-orchestrator` | Merged result, which agent handled each part, reused context, next step. | It must not claim evidence that focused agents did not provide. |
 
@@ -150,6 +150,7 @@ Use these prompts for launch regression:
 | "这些 ON_HOLD 订单分别被什么规则卡住" | `hold` | Return direct proof if available; otherwise candidate/historical boundary. |
 | "创建一个 imported order 的 hold 规则" | `hold` | Draft first; real create requires second confirmation. |
 | "取消一个 warehouse processing 的订单" | `operations` | Pre-check dispatch/WMS risk; require second confirmation; post-check dispatch. |
+| "这个 dispatch/DN/WMS 到哪一步了" | `allocation` | Return dispatch number, DN, warehouse, WMS/warehouse status, allocation completion, and next step. |
 | "这个 EXCEPTION 订单怎么处理" | `exception` | Explain cause, solution, next step; route shortage to replenishment. |
 | "给这个 SKU 补货到哪个仓" | `replenishment` | Recommend warehouse with evidence and alternatives. |
 | "创建 split PO" | `replenishment` | Preview target warehouses/SKUs; require second confirmation. |
@@ -160,7 +161,8 @@ Use these prompts for launch regression:
 - [ ] Every real write path has second-confirmation copy.
 - [ ] Allocation explanations use dispatch explain/log evidence when available.
 - [ ] Hold rule causality does not overstate candidate matching.
-- [ ] Operations does not own allocation or hold release.
+- [ ] Allocation owns normal allocation, dispatch/fulfillment/WMS state, dispatch release/retry, and reopen-for-allocation retry.
+- [ ] Operations does not own allocation, general dispatch/fulfillment diagnosis, or hold release.
 - [ ] Replenishment does not claim PO dispatch equals received inventory.
 - [ ] Batch workflows return per-order outcomes and do not block on one slow order.
 - [ ] `order-orchestrator` passes shared context and avoids repeated detail loops.

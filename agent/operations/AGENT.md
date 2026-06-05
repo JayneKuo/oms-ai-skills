@@ -17,7 +17,7 @@ Handle high-impact sales order operations with confirmation and careful result i
 
 Read-only pre-checks run directly. Every real cancel/batch cancel write must require user second confirmation before execution. Distinguish accepted/ongoing requests from completed business results. Do not diagnose ON_HOLD, allocation, or replenishment in this agent; hand off to hold/allocation/replenishment where needed.
 
-Operations must not execute manual allocation, auto allocation, force allocation, reopen-for-allocation retry, or allocation diagnostics. All warehouse allocation/dispatch retry reads and writes belong to the `allocation` agent to avoid conflicting ownership and duplicated loops.
+Operations must not execute manual allocation, auto allocation, force allocation, reopen-for-allocation retry, dispatch release/retry, allocation diagnostics, or general dispatch/DN/WMS/fulfillment diagnosis. All warehouse allocation/dispatch/fulfillment reads and writes belong to the `allocation` agent to avoid conflicting ownership and duplicated loops, except cancel-specific dispatch post-checks.
 
 Operations must not release hold. Hold release belongs to the `hold` agent because it needs hold-rule evidence and post-release ON_HOLD verification.
 

@@ -25,7 +25,7 @@ Examples:
 - `query` - lightweight order list/detail/status lookup.
 - `exception` - EXCEPTION cause, solution, and next step.
 - `hold` - ON_HOLD evidence, hold rule management, release hold, and hold outcome explanation.
-- `allocation` - warehouse assignment, allocation evidence, remaining quantity, reopen-for-allocation retry, manual/auto allocation eligibility, and confirmed allocation execution.
+- `allocation` - warehouse assignment, dispatch/DN/WMS/fulfillment state, allocation evidence, remaining quantity, dispatch release/retry, reopen-for-allocation retry, manual/auto allocation eligibility, and confirmed allocation execution.
 - `operations` - high-risk non-allocation writes: cancel and batch cancel.
 - `replenishment` - replenishment recommendations and purchase order creation.
 
@@ -35,7 +35,7 @@ Examples:
 - If the user asks only to look up an order or status, route to `query`.
 - If the order is or the user mentions `EXCEPTION`, route to `exception`.
 - If the order is or the user mentions `ON_HOLD`, hold rules, or release hold, route to `hold`.
-- If the user asks why an order was assigned to a warehouse, whether it can be manually/auto/force allocated, or whether it can be reopened to retry allocation, route to `allocation`.
+- If the user asks why an order was assigned to a warehouse, dispatch/DN/WMS/fulfillment state, warehouse processing progress, whether it can be manually/auto/force allocated, or whether it can be reopened to retry allocation, route to `allocation`.
 - If the user asks to cancel or batch cancel, route to `operations`.
 - If the user asks about replenishment, recommended purchase warehouse, or purchase order creation, route to `replenishment`.
 - For multi-step workflows, call agents in business order and merge their conclusions.

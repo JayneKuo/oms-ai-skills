@@ -22,7 +22,7 @@ description: Coordinate split OMS order skills. Use as the default order entry p
 1. Status/list/detail only: `query`.
 2. EXCEPTION cause or solution: `exception`.
 3. ON_HOLD, hold rule, hold rule management, release hold: `hold`.
-4. Warehouse allocation result/reason, remaining quantity, reopen-for-allocation retry, manual/auto/force allocation, batch allocation: `allocation`.
+4. Warehouse allocation result/reason, dispatch/DN/WMS/fulfillment state, warehouse processing progress, remaining quantity, reopen-for-allocation retry, manual/auto/force allocation, batch allocation: `allocation`.
 5. Cancel and batch cancel: `operations`.
 6. Replenishment, recommended purchase warehouse, PO creation: `replenishment`.
 
@@ -31,8 +31,8 @@ description: Coordinate split OMS order skills. Use as the default order entry p
 - `query` owns base lookup and test-order creation only.
 - `exception` owns exception cause/solution diagnosis only.
 - `hold` owns hold evidence, hold rule query/create draft, rule-to-order candidate mapping, and release hold.
-- `allocation` owns allocation evidence, allocation explanation, remaining quantity, reopen-for-allocation retry, and allocation writes.
-- `operations` owns cancel only; it does not own reopen, hold release, or allocation.
+- `allocation` owns allocation evidence, allocation explanation, dispatch/fulfillment/WMS state, DN lookup, remaining quantity, reopen-for-allocation retry, dispatch release/retry, and allocation writes.
+- `operations` owns cancel only; it does not own reopen, hold release, allocation, dispatch release/retry, or general fulfillment diagnosis.
 - `replenishment` owns replenishment recommendation and PO creation; it does not explain sales-order allocation reasons.
 
 ## Shared Context Rules
@@ -69,6 +69,12 @@ Warehouse assignment:
 1. `query` gets detail once.
 2. `allocation` fetches dispatch explain logs and allocation items.
 3. Final answer includes result, reason, confidence, and next step.
+
+Dispatch/fulfillment state:
+
+1. `query` may get detail once.
+2. `allocation` reads dispatch/DN/WMS handoff fields and allocation items; it fetches dispatch explain only if the user asks why the warehouse was selected.
+3. Final answer says whether allocation is complete, what dispatch/DN/WMS state is confirmed, and whether the next step is warehouse/WMS or allocation retry.
 
 Cancel dispatched order:
 

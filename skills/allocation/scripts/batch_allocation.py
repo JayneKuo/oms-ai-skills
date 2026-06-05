@@ -9,6 +9,7 @@ Examples:
   python batch_allocation.py --action explain --orders SO001 SO002
   python batch_allocation.py --action items --orders SO001 SO002
   python batch_allocation.py --action check --orders SO001 SO002
+  python batch_allocation.py --action fulfillment --orders SO001 SO002
   python batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
 """
 import argparse
@@ -25,6 +26,7 @@ import oms_client
 import explain_warehouse_assignment as explainer
 import manual_allocate as manual
 import reopen_order as allocation_reopen
+import get_dispatch_fulfillment as dispatch_fulfillment
 
 
 def parse_orders(args):
@@ -185,6 +187,17 @@ def run_one(order_no, args):
             result = summarize_items(order_no)
         elif args.action == "check":
             result = summarize_check(order_no)
+        elif args.action == "fulfillment":
+            fulfillment = dispatch_fulfillment.summarize_dispatch_fulfillment(order_no)
+            result = {
+                "orderNo": order_no,
+                "state": (fulfillment.get("fulfillmentStage") or {}).get("stage"),
+                "status": (fulfillment.get("orderSummary") or {}).get("status"),
+                "statusName": (fulfillment.get("orderSummary") or {}).get("statusName"),
+                "dispatches": fulfillment.get("dispatches"),
+                "remaining": (fulfillment.get("allocationSummary") or {}).get("totalRemainingQty"),
+                "summary": fulfillment.get("userFacingSummary"),
+            }
         elif args.action == "manual_allocate":
             result = summarize_manual_allocate(order_no, args)
         elif args.action == "reopen":
@@ -224,7 +237,7 @@ def build_batch_summary(results):
 def main():
     parser = argparse.ArgumentParser()
     oms_client.add_config_arg(parser)
-    parser.add_argument("--action", required=True, choices=["explain", "items", "check", "manual_allocate", "reopen"])
+    parser.add_argument("--action", required=True, choices=["explain", "items", "check", "fulfillment", "manual_allocate", "reopen"])
     parser.add_argument("--orders", nargs="*", default=[])
     parser.add_argument("--orders-file", default=None)
     parser.add_argument("--max-workers", type=int, default=4)

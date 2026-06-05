@@ -11,7 +11,7 @@ description: Execute high-impact non-allocation OMS sales-order operations, main
 - Read-only pre-checks may run directly. Every real cancel/batch cancel write must require user second confirmation before execution.
 - Always require user second confirmation before writes. The confirmation prompt must include environment, operation, target order(s), business risk, and the exact confirmation phrase.
 - Do not diagnose ON_HOLD, EXCEPTION, allocation reason, or replenishment from scratch. Ask the relevant focused skill to provide diagnosis first.
-- Do not execute manual allocation, auto allocation, force allocation, reopen-for-allocation retry, allocation precheck, or allocation explanation. All allocation/dispatch retry reads and writes are owned by `allocation`.
+- Do not execute manual allocation, auto allocation, force allocation, reopen-for-allocation retry, dispatch release/retry, allocation precheck, allocation explanation, or general dispatch/fulfillment diagnosis. All allocation/dispatch/fulfillment reads and writes are owned by `allocation`, except cancel-specific dispatch post-checks.
 - Do not release hold here. Hold release belongs to `hold`, because it requires hold-rule evidence, latest ON_HOLD status, and post-release hold checks.
 - After execution, distinguish API acceptance from completed business outcome. Never call a submitted/ongoing request "fully successful" until a follow-up status check proves it.
 - Cancel with dispatch/WMS records may return `ongoingRespDTOS`. Treat this as downstream Kafka/WMS cancellation in progress, not final success.
@@ -66,6 +66,7 @@ To proceed, reply exactly: [confirmation phrase]
 
 - Do not perform allocation under operations.
 - Do not perform reopen-for-allocation retry under operations; route it to allocation.
+- Do not answer general dispatch/DN/WMS/fulfillment progress questions under operations; route them to allocation.
 - Do not release hold under operations.
 - Do not call accepted/ongoing cancel "successful" before post-check.
 - Do not expose credentials or full raw payloads by default.

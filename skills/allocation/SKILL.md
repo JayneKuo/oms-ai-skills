@@ -1,6 +1,6 @@
 ﻿---
 name: allocation
-description: Diagnose and operate OMS sales-order allocation, dispatch assignment, reopen-for-allocation retry, remaining quantity, manual/auto allocation eligibility, and allocation explanations. Use when the user asks which warehouse an order went to, why it went there, whether allocation can be performed, or whether an exception order should be reopened to retry allocation.
+description: Diagnose and operate OMS sales-order allocation, dispatch assignment, dispatch/fulfillment state, WMS handoff evidence, reopen-for-allocation retry, remaining quantity, manual/auto allocation eligibility, and allocation explanations. Use when the user asks which warehouse an order went to, why it went there, whether allocation can be performed, what the dispatch/DN/WMS state is, or whether an exception order should be reopened to retry allocation.
 ---
 
 # Allocation Skill
@@ -39,9 +39,10 @@ python scripts/manual_allocate.py --order SO001 --dispatch-type HAND_SKU_DISPATC
 ```
 ## Runtime Guardrails
 
-- Use this skill for warehouse allocation result, allocation evidence, manual-allocation eligibility, and remaining quantity checks.
+- Use this skill for warehouse allocation result, allocation evidence, manual-allocation eligibility, remaining quantity checks, normal dispatch results, dispatch/DN lookup, fulfillment progress, and WMS/warehouse handoff state.
 - Read-only allocation checks/explanations may run directly. Any real manual/auto/force/batch allocation write must require user second confirmation before execution.
-- This skill owns allocation writes too: manual specified-warehouse dispatch, manual SKU dispatch, whole-order auto dispatch, SKU auto dispatch, reopen-for-allocation retry, force allocation after second confirmation, and batch allocation. Do not delegate allocation execution to `operations`.
+- This skill owns allocation writes too: manual specified-warehouse dispatch, manual SKU dispatch, whole-order auto dispatch, SKU auto dispatch, reopen-for-allocation retry, force allocation after second confirmation, and batch allocation. It also owns read-only dispatch/fulfillment/WMS state checks after allocation. Do not delegate allocation, dispatch release/retry, or general fulfillment diagnosis to `operations`.
+- `operations` may inspect dispatch only to prove a cancel completed or was rejected. General questions like "where is the dispatch", "what is the DN", "why is it warehouse processing", "did WMS receive it", and "why is it not shipped" belong here.
 - Warehouse assignment reasons must come from real allocation, dispatch explain logs, route execution logs, or explicit order-detail evidence. Final warehouse/status fields alone prove the result, not the reason.
 - Always check remaining quantity before recommending manual allocation. If remaining is zero, say manual allocation is not needed or not possible.
 - For already allocated orders, do not say "I will allocate it" or "allocation failed" first. Say "this order is already allocated", show the dispatch/warehouse/SKU/remaining details, and explain there are no allocatable products left.
@@ -71,6 +72,14 @@ For blocked allocation writes where the order is already allocated:
 3. Business conclusion: no allocatable products remain, so allocation was not submitted.
 4. Reason/evidence: allocation items, order dispatch, and dispatch explain log when available.
 5. Next step: check WMS/downstream progress or choose a different eligible order if the user wants to test manual allocation.
+
+For dispatch/fulfillment/WMS questions:
+
+1. Current state: sales order status plus dispatch/fulfillment stage.
+2. Dispatch evidence: dispatch number, DN/behind order number, warehouse, dispatch status, WMS/channel fields, and callback time when available.
+3. Allocation conclusion: whether allocation is already complete and whether any remaining allocatable quantity exists.
+4. Reason/evidence: dispatch explain log if the user asks why it went to that warehouse; otherwise order-detail dispatch records are enough for status.
+5. Next step: no allocation action, WMS/warehouse follow-up, logistics tracking, or second confirmation if a real allocation retry/write is needed.
 
 For allocation write requests before execution, reply first:
 
@@ -120,11 +129,13 @@ python scripts/get_allocation_items.py --order SO00361770
 python scripts/get_order_detail.py --order SO00361770
 python scripts/get_routing_rules.py
 python scripts/explain_warehouse_assignment.py --order SO00361770
+python scripts/get_dispatch_fulfillment.py --order SO00361770
 python scripts/reopen_order.py --order SO00361770 --confirm-reopen
 python scripts/manual_allocate.py --order SO00361770 --warehouse WH-001 --skus '[{"sku":"SKU-A","qty":2}]' --confirm-allocation
 python scripts/batch_allocation.py --action explain --orders SO001 SO002
 python scripts/batch_allocation.py --action items --orders SO001 SO002
 python scripts/batch_allocation.py --action check --orders SO001 SO002
+python scripts/batch_allocation.py --action fulfillment --orders SO001 SO002
 python scripts/batch_allocation.py --action reopen --orders SO001 SO002 --confirm-allocation
 python scripts/batch_allocation.py --action manual_allocate --orders SO001 SO002 --dispatch-type HAND_WHOLE_AUTO_DISPATCH --confirm-allocation
 ```
@@ -136,6 +147,7 @@ Support batch user requests for every allocation capability:
 - Batch query/explain: `batch_allocation.py --action explain`.
 - Batch remaining items: `batch_allocation.py --action items`.
 - Batch manual eligibility: `batch_allocation.py --action check`.
+- Batch dispatch/fulfillment state: `batch_allocation.py --action fulfillment`.
 - Batch reopen allocation retry: `batch_allocation.py --action reopen`.
 - Batch manual/auto allocation after user second confirmation: `batch_allocation.py --action manual_allocate`.
 

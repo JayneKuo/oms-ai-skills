@@ -15,8 +15,8 @@ Legacy compatibility entry point: `sales-order`.
 | `query` | Lightweight order lookup, basic status explanation, exact detail fallback, explicit test-order creation | `query_orders.py`, `get_order_detail.py`, `create_order.py` | Test-order creation only after second confirmation | Ready with guardrails |
 | `exception` | EXCEPTION diagnosis and next-step planning | `query_orders.py`, `get_order_detail.py`, `diagnose_exception.py` | No | Ready with guardrails |
 | `hold` | ON_HOLD diagnosis, hold evidence, hold rule query, rule-to-order candidate mapping, release assessment, natural-language hold rule drafting | `get_order_detail.py`, `get_hold_reason.py`, `get_allocation_items.py`, `release_hold.py`, `diagnose_hold.py`, `hold_rules.py`, `match_hold_rules_to_orders.py` | Release hold exists; hold rule create exists but defaults to dry-run and requires second confirmation for real submit | Ready with caution |
-| `allocation` | Allocation result, automatic allocation reason, remaining quantity, manual-allocation eligibility, batch allocation workflows | `explain_warehouse_assignment.py`, `check_manual_allocation.py`, `get_allocation_items.py`, `manual_allocate.py`, `batch_allocation.py`, dispatch explain endpoint | Allocation reads and writes are owned here; writes require user second confirmation and precheck | Ready |
-| `operations` | High-impact non-allocation order writes: cancel and batch cancel | `get_order_detail.py`, `cancel_order.py`, `batch_orders.py` | Yes, only after second confirmation; no allocation/reopen or hold-release writes | Ready for controlled use |
+| `allocation` | Allocation result, automatic allocation reason, dispatch/DN/WMS/fulfillment state, remaining quantity, manual-allocation eligibility, batch allocation workflows | `explain_warehouse_assignment.py`, `get_dispatch_fulfillment.py`, `check_manual_allocation.py`, `get_allocation_items.py`, `manual_allocate.py`, `batch_allocation.py`, dispatch explain endpoint | Allocation reads and writes are owned here; writes require user second confirmation and precheck | Ready |
+| `operations` | High-impact non-allocation order writes: cancel and batch cancel | `get_order_detail.py`, `cancel_order.py`, `batch_orders.py` | Yes, only after second confirmation; no allocation/reopen, dispatch release/retry, general fulfillment diagnosis, or hold-release writes | Ready for controlled use |
 | `replenishment` | Replenishment recommendation, purchase warehouse explanation, single/split PO creation | `get_order_detail.py`, `suggest_purchase_order.py`, `get_routing_rules.py`, `create_purchase_order.py`, `create_purchase_order_split.py` | PO creation only after second confirmation | Ready with caution |
 | `order-orchestrator` | Routing, shared context reuse, and multi-step composition | No direct scripts | No direct writes | Ready as default entry |
 
@@ -113,15 +113,18 @@ Use for:
 - Checking remaining quantity.
 - Checking manual-allocation eligibility.
 - Explaining current warehouse allocation result.
+- Reading dispatch/DN/WMS/warehouse-processing/fulfillment state after allocation.
 - Explaining automatic allocation reason from dispatch explain logs, including routing rules checked, available warehouses, inventory checks, decisive rule/event, and final dispatch.
 - Explaining allocation reason when dispatch/allocation/route/log evidence exists.
 - Batch allocation explain/items/check/manual-auto allocation using bounded concurrency when OMS has no batch endpoint.
+- Batch dispatch/fulfillment state using bounded concurrency.
 
 Do not use for:
 
 - Executing any real manual/auto/force/batch allocation write without user second confirmation.
 - Inferring allocation reason from final warehouse/status fields alone.
 - Replenishment or PO creation.
+- General cancel execution; cancel belongs to `operations`.
 
 User-facing output:
 
@@ -131,16 +134,16 @@ User-facing output:
 - If remaining is `0`, explain the existing warehouse/dispatch/SKU allocation details and say there are no allocatable products; do not submit allocation by default.
 - If eligibility API returns a technical error code, translate it into business language.
 - For batch requests, return concise per-order status and partial results; do not make the user wait for one slow order to finish before seeing all outcomes.
+- For dispatch/fulfillment questions, include dispatch number, DN/behind order number, warehouse, WMS/warehouse status, allocation completion, and next step.
 
 ### operations
 
 Use for:
 
-- Reopen.
 - Cancel.
 - Batch cancel.
-- Non-allocation high-impact writes only; allocation execution belongs to `allocation`.
-- Interpreting async/submitted operation outcomes.
+- Non-allocation high-impact writes only; allocation execution and dispatch retry/release belong to `allocation`.
+- Interpreting async/submitted cancel outcomes.
 - Confirming downstream cancel state by re-reading sales order and dispatch records.
 
 Do not use for:
@@ -148,6 +151,7 @@ Do not use for:
 - Initial diagnosis of EXCEPTION/ON_HOLD/allocation/replenishment.
 - Release hold; use `hold`.
 - Manual/auto/force allocation; use `allocation`.
+- Dispatch/DN/WMS/fulfillment diagnosis; use `allocation`.
 - Any real write/action without user second confirmation.
 
 Confirmation must include:
@@ -219,6 +223,6 @@ Routing priorities:
 1. Status/list/detail: `query`.
 2. EXCEPTION cause/solution: `exception`.
 3. ON_HOLD/hold rule/release hold: `hold`.
-4. Allocation result/reason/remaining: `allocation`.
+4. Allocation result/reason/dispatch/DN/WMS/fulfillment/remaining: `allocation`.
 5. Cancel/batch cancel confirmed writes: `operations`; reopen-for-allocation retry: `allocation`.
 6. Replenishment/recommended PO warehouse/PO creation: `replenishment`.
